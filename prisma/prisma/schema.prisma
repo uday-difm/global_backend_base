@@ -1,0 +1,958 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum GlobalRole {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+  AUTHOR
+  VIEWER
+}
+
+enum SiteRole {
+  ADMIN
+  EDITOR
+  AUTHOR
+  VIEWER
+}
+
+model Site {
+  id        String    @id @default(cuid())
+  name      String
+  domain    String?   @unique @db.VarChar(191)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users SiteUser[]
+  pages Page[]
+
+  integrationKey       String?                 @unique @db.VarChar(191)
+  frontendProjects     FrontendProject[]
+  integrationManifests IntegrationManifest[]
+  globalSettings       GlobalSettings[]
+  webhookEvents        WebhookEvent[]
+  webhookSubscriptions WebhookSubscription[]
+  posts                Post[]
+  categories           Category[]
+  tags                 Tag[]
+  services             Service[]
+  testimonials         Testimonial[]
+  faqs                 Faq[]
+  teamMembers          TeamMember[]
+  legalPages           LegalPage[]
+  redirects            Redirect[]
+  visitorLogs          VisitorLog[]
+  contactSubmissions   ContactFormSubmission[]
+  leads                Lead[]
+  apiKeys              ApiKey[]
+  media                Media[]
+  mediaFolders         MediaFolder[]
+  ipBlocks             IpBlock[]
+  errorLogs            SystemErrorLog[]
+  notificationAlerts   NotificationAlert[]
+  contentVersions      ContentVersion[]
+  newsletters          Newsletter[]
+  subscribers          Subscriber[]
+  subscriberLists      SubscriberList[]
+  emailTemplates       EmailTemplate[]
+  emailCampaigns       EmailCampaign[]
+  pushNotifications    PushNotification[]
+  cookieConsentLogs    CookieConsentLog[]
+  comments             Comment[]
+  adZones              AdZone[]
+
+  @@index([isActive])
+}
+
+model User {
+  id String @id @default(cuid())
+
+  email                String                @unique @db.VarChar(191)
+  name                 String?
+  bio                  String?
+  passwordHash         String
+  webhookSubscriptions WebhookSubscription[]
+  globalRole           GlobalRole            @default(VIEWER)
+
+  isActive Boolean @default(true)
+
+  twoFAEnabled Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  sites SiteUser[]
+
+  auditLogs      AuditLog[]
+  loginHistory   LoginHistory[]
+  twoFactor      TwoFactor?
+  posts          Post[]
+  passwordResets PasswordReset[]
+
+  @@index([email])
+  @@index([isActive])
+}
+
+model SiteUser {
+  id String @id @default(cuid())
+
+  siteId String @db.VarChar(50)
+  userId String @db.VarChar(50)
+
+  role SiteRole @default(EDITOR)
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@index([siteId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  siteId String?
+  userId String
+
+  action String
+
+  meta Json?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([siteId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model LoginHistory {
+  id String @id @default(cuid())
+
+  userId String
+
+  ipAddress String?
+  userAgent String?
+
+  success Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model TwoFactor {
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  secret String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Media {
+  id     String @id @default(cuid())
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  fileName     String
+  originalName String?
+
+  publicId  String
+  url       String
+  secureUrl String?
+
+  mimeType  String?
+  extension String?
+
+  size Int?
+
+  width  Int?
+  height Int?
+
+  altText String?
+
+  isImage    Boolean @default(false)
+  isVideo    Boolean @default(false)
+  isDocument Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  folderId String?
+  folder   MediaFolder? @relation(fields: [folderId], references: [id])
+  posts    Post[]
+  services Service[]
+
+  @@index([siteId])
+}
+
+model MediaFolder {
+  id     String @id @default(cuid())
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  name String
+
+  parentId String?
+  parent   MediaFolder? @relation("FolderTree", fields: [parentId], references: [id])
+
+  children MediaFolder[] @relation("FolderTree")
+
+  media Media[]
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([siteId])
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Page {
+  id     String @id @default(cuid())
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  title  String
+  slug   String     @db.VarChar(50)
+  status PageStatus @default(DRAFT)
+
+  jsonLd Json?
+
+  seoTitle       String?
+  seoDescription String?
+  canonicalUrl   String?
+  ogImage        String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  publishedAt     DateTime?
+  publishedBy     String?
+  isDiscovered    Boolean   @default(false)
+  isManagedBySync Boolean   @default(true)
+  isHardcoded     Boolean   @default(false)
+  sourceRoute     String?
+
+  // Sitemap fields
+  priority     Float?
+  changeFreq   String?
+  sections     Section[]
+  faqs         Faq[]
+  syncedRoutes SyncedRoute[]
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model Section {
+  id String @id @default(cuid())
+
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  name String?
+
+  type String
+
+  order Int @default(0)
+
+  isVisible Boolean @default(true)
+  isDeleted Boolean @default(false)
+
+  content Json
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([pageId])
+  @@index([pageId, order])
+}
+
+model FrontendProject {
+  id               String        @id @default(cuid())
+  siteId           String
+  site             Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name             String
+  framework        String
+  apiKey           String        @unique @db.VarChar(191)
+  isActive         Boolean       @default(true)
+  lastSyncAt       DateTime?
+  baseUrl          String?
+  sdkVersion       String?
+  syncStatus       String?
+  lastManifestHash String?
+  syncedRoutes     SyncedRoute[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([siteId])
+  @@index([siteId, isActive])
+}
+
+model SyncedRoute {
+  id String @id @default(cuid())
+
+  frontendProjectId String
+  frontendProject   FrontendProject @relation(fields: [frontendProjectId], references: [id], onDelete: Cascade)
+
+  route        String @db.VarChar(50)
+  source       String?
+  discoveredAt DateTime @default(now())
+  pageId       String?
+  page         Page?    @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@unique([frontendProjectId, route])
+  @@index([frontendProjectId])
+  @@index([pageId])
+}
+
+model IntegrationManifest {
+  id           String   @id @default(cuid())
+  siteId       String
+  source       String?
+  manifestHash String?
+  rawJson      Json
+  createdAt    DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@index([createdAt])
+}
+
+model GlobalSettings {
+  id                String    @id @default(cuid())
+  siteId            String    @unique
+  site              Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  header            Json?
+  footer            Json?
+  analytics         Json?
+  scripts           Json?
+  contactDetails    Json?
+  websiteSettings   Json?
+  emailSettings     Json?
+  securityControls  Json?
+  compliance        Json?
+  notifications     Json?
+  ctaConfig         Json?
+  performanceConfig Json?
+  devTools          Json?
+  deploymentNotes   Json?
+  navigation        Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  @@index([siteId])
+  @@map("GlobalSettings")
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@index([siteId])
+  @@index([type])
+}
+
+model WebhookSubscription {
+  id        String    @id @default(cuid())
+  siteId    String
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  events    Json
+  secret    String
+  isActive  Boolean   @default(true)
+  failCount Int       @default(0)
+  lastError String?
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@index([siteId])
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+model Category {
+  id     String @id @default(cuid()) @db.VarChar(50)
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name   String @db.VarChar(50)
+  slug   String @db.VarChar(50)
+  posts  Post[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([siteId, name])
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model Tag {
+  id     String @id @default(cuid()) @db.VarChar(50)
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name   String @db.VarChar(50)
+  slug   String @db.VarChar(50)
+  posts  Post[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([siteId, name])
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model Post {
+  id          String     @id @default(cuid()) @db.VarChar(50)
+  siteId      String
+  site        Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String @db.VarChar(50)
+  content     Json?
+  contentJson String?
+  excerpt     String?
+  status      PostStatus @default(DRAFT)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  featuredImageId String?
+  featuredImage   Media?  @relation(fields: [featuredImageId], references: [id])
+
+  categories Category[]
+  tags       Tag[]
+  comments   Comment[]
+
+  seoTitle       String?
+  seoDescription String?
+  canonicalUrl   String?
+  ogImage        String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  publishedAt DateTime?
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+  @@index([siteId, status])
+  @@index([authorId])
+  @@index([featuredImageId])
+}
+
+enum ServiceStatus {
+  DRAFT
+  ACTIVE
+}
+
+model Service {
+  id     String @id @default(cuid())
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String?
+  price         String?
+  ctaButtonText String?
+  ctaButtonLink String?
+  sortOrder     Int           @default(0)
+  status        ServiceStatus @default(DRAFT)
+  faqs          Json?
+  visible       Boolean       @default(true)
+
+  featuredImageId String?
+  featuredImage   Media?  @relation(fields: [featuredImageId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([siteId])
+  @@index([featuredImageId])
+  @@index([siteId, status, visible])
+}
+
+model Testimonial {
+  id          String    @id @default(cuid())
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  clientName  String
+  clientImage String?
+  rating      Int       @default(5)
+  content     String
+  showHide    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([siteId])
+  @@index([siteId, sortOrder])
+}
+
+model Faq {
+  id           String    @id @default(cuid())
+  siteId       String
+  site         Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  question     String
+  answer       String
+  pageId       String?
+  page         Page?     @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  sortOrder    Int       @default(0)
+  showHide     Boolean   @default(true)
+  schemaMarkup Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@index([siteId])
+  @@index([siteId, sortOrder])
+  @@index([pageId])
+}
+
+model TeamMember {
+  id          String    @id @default(cuid())
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name        String
+  role        String
+  photo       String?
+  bio         String?
+  socialLinks Json?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([siteId])
+  @@index([siteId, sortOrder])
+}
+
+model LegalPage {
+  id          String    @id @default(cuid())
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  type        String @db.VarChar(50)
+  title       String
+  content     String
+  contentJson String?
+  published   Boolean   @default(false)
+  lastUpdated DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([siteId, type])
+  @@index([siteId])
+}
+
+model Redirect {
+  id        String    @id @default(cuid())
+  siteId    String
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  source    String @db.VarChar(50)
+  target    String
+  type      Int       @default(301)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([siteId, source])
+  @@index([siteId])
+}
+
+model VisitorLog {
+  id            String   @id @default(cuid())
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  visitorId     String
+  pageViewed    String
+  ipAddress     String?
+  location      String?
+  deviceInfo    String?
+  trafficSource String?
+  duration      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([siteId])
+  @@index([siteId, createdAt])
+}
+
+model ContactFormSubmission {
+  id        String    @id @default(cuid())
+  siteId    String
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    String    @default("new") @db.VarChar(20)
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([siteId])
+  @@index([siteId, status])
+}
+
+model Lead {
+  id              String    @id @default(cuid())
+  siteId          String
+  site            Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name            String
+  email           String
+  phone           String?
+  serviceInterest String?
+  sourcePage      String?
+  status          String    @default("new") @db.VarChar(20)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  @@index([siteId])
+  @@index([siteId, status])
+}
+
+model ApiKey {
+  id        String    @id @default(cuid())
+  siteId    String
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name      String
+  key       String    @unique @db.VarChar(191)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([siteId])
+}
+
+model IpBlock {
+  id        String   @id @default(cuid())
+  siteId    String
+  ipAddress String @db.VarChar(50)
+  reason    String?
+  createdAt DateTime @default(now())
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, ipAddress])
+  @@index([siteId])
+}
+
+model SystemErrorLog {
+  id        String   @id @default(cuid())
+  siteId    String?
+  message   String
+  stack     String?
+  context   Json?
+  createdAt DateTime @default(now())
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@index([createdAt])
+}
+
+model NotificationAlert {
+  id        String   @id @default(cuid())
+  siteId    String
+  title     String
+  message   String
+  type      String // "NEW_LEAD" | "FAILED_FORM" | "BLOG_ALERT"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@index([createdAt])
+}
+
+/// Stores revision snapshots for all content types (pages, posts, services, etc.)
+model Newsletter {
+  id        String   @id @default(cuid())
+  siteId    String
+  email     String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@map("Newsletter")
+}
+
+model ContentVersion {
+  id         String   @id @default(cuid())
+  siteId     String
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  entityType String @db.VarChar(20) // "PAGE", "POST", "SERVICE", "TESTIMONIAL", "FAQ", "TEAM_MEMBER", "LEGAL_PAGE"
+  entityId   String @db.VarChar(36)
+  version    Int
+  data       Json // Full snapshot of the entity at this version
+  createdBy  String? // userId who made the change
+  createdAt  DateTime @default(now())
+
+  @@index([siteId, entityType, entityId])
+  @@index([siteId, entityType, entityId, version])
+  @@index([createdAt])
+}
+
+// ========== CRM & SUBSCRIBERS ==========
+model Subscriber {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  email       String @db.VarChar(50)
+  name        String?
+  status      String   @default("active") // active, unsubscribed, bounced, spam
+  tags        String?  @db.Text  // Comma-separated or JSON list of tags
+  metadata    String?  @db.Text  // JSON metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaignLogs CampaignLog[]
+  lists        SubscriberListMember[]
+  
+  @@unique([siteId, email])
+  @@index([siteId])
+}
+
+model SubscriberList {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name        String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscribers  SubscriberListMember[]
+  campaigns    EmailCampaign[]
+
+  @@index([siteId])
+}
+
+model SubscriberListMember {
+  id           String         @id @default(cuid())
+  listId       String @db.VarChar(50)
+  list         SubscriberList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  subscriberId String @db.VarChar(50)
+  subscriber   Subscriber     @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+
+  @@unique([listId, subscriberId])
+  @@index([listId])
+  @@index([subscriberId])
+}
+
+// ========== NEWSLETTERS & CAMPAIGNS ==========
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name        String
+  subject     String?
+  htmlContent String   @db.LongText
+  designJson  String?  @db.LongText // Drag-drop builder state
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([siteId])
+}
+
+model EmailCampaign {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name        String
+  subject     String
+  body        String   @db.LongText
+  listId      String?
+  list        SubscriberList? @relation(fields: [listId], references: [id], onDelete: SetNull)
+  status      String   @default("draft") // draft, scheduled, sending, sent, failed
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  logs        CampaignLog[]
+
+  @@index([siteId])
+}
+
+model CampaignLog {
+  id           String        @id @default(cuid())
+  campaignId   String @db.VarChar(50)
+  campaign     EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriberId String @db.VarChar(50)
+  subscriber   Subscriber    @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  status       String        @default("pending") // pending, sent, failed, opened, clicked
+  errorMessage String?       @db.Text
+  sentAt       DateTime?
+  openedAt     DateTime?
+  clickedAt    DateTime?
+
+  @@unique([campaignId, subscriberId])
+  @@index([campaignId])
+  @@index([subscriberId])
+}
+
+// ========== PUSH NOTIFICATIONS ==========
+model PushNotification {
+  id          String   @id @default(cuid())
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  title       String
+  message     String   @db.Text
+  url         String?
+  status      String   @default("draft") // draft, sending, sent, failed
+  oneSignalId String?  // OneSignal push UUID
+  sentCount   Int      @default(0)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([siteId])
+}
+
+// ========== GDPR & CONSENT ==========
+model CookieConsentLog {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  visitorId String
+  accepted  Boolean  @default(false)
+  analytics Boolean  @default(false)
+  marketing Boolean  @default(false)
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([siteId])
+}
+
+// ========== COMMENTS ==========
+model Comment {
+  id          String    @id @default(cuid())
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  postId      String    @db.VarChar(50)
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorName  String
+  authorEmail String
+  content     String    @db.Text
+  status      String    @default("pending") // pending, approved, spam, trash
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([postId])
+  @@index([siteId])
+}
+
+// ========== ADVERTISEMENT MANAGEMENT ==========
+model AdZone {
+  id        String   @id @default(cuid())
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String   @db.VarChar(50)
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ads       Ad[]
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model Ad {
+  id          String       @id @default(cuid())
+  zoneId      String
+  zone        AdZone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  name        String
+  type        String       // "banner" or "adsense"
+  code        String?      @db.Text
+  imageUrl    String?
+  targetUrl   String?
+  isActive    Boolean      @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  impressions Int          @default(0)
+  clicks      Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  analytics   AdAnalytic[]
+
+  @@index([zoneId])
+}
+
+model AdAnalytic {
+  id        String   @id @default(cuid())
+  adId      String
+  ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+  type      String   // "impression" or "click"
+  visitorId String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([adId])
+}
