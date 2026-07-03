@@ -230,7 +230,8 @@ my-new-site/
 │   ├── services/            ← Backend business logic (DO NOT modify)
 │   ├── core/                ← Error handling, events (DO NOT modify)
 │   ├── lib/                 ← Prisma client, helpers (DO NOT modify)
-│   └── instrumentation.js   ← Server startup hook (DO NOT modify)
+│   ├── instrumentation.js   ← Server startup hook (DO NOT modify)
+│   └── proxy.js             ← Route proxy/middleware (DO NOT modify)
 ├── .env                     ← YOUR config (copy from .env.example)
 ├── package.json             ← Add frontend deps here
 └── INTEGRATE.md             ← This file
