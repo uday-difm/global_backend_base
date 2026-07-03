@@ -72,20 +72,22 @@ export default async function RootLayout({ children }) {
   //   2. Fetch any layout data you need (navigation, settings, etc.)
   //   3. Wrap {children} with your header/footer
   //
-  // Example:
-  //
   //   import Header from "@/components/Header";
   //   import Footer from "@/components/Footer";
   //   import { getLayoutData } from "@/services/layout.service";
+  //   import { CookieConsentBanner, CtaPopups, CtaFloatingButtons } from "@yourcompany/global-backend-next/components";
   //
   //   const layout = await getLayoutData();
   //
   //   return (
   //     <html lang="en">
   //       <body>
-  //         <Header navigation={layout.navigation} />
+  //         <Header navigation={layout.navigation} logoUrl={layout.logoUrl} />
   //         <main>{children}</main>
-  //         <Footer />
+  //         <Footer navigation={layout.navigation} copyright={layout.copyright} />
+  //         <CookieConsentBanner complianceSettings={layout.rawSettings?.compliance} siteId={process.env.NEXT_PUBLIC_SITE_ID} baseUrl={process.env.NEXT_PUBLIC_CMS_BASE_URL} />
+  //         <CtaPopups ctaConfig={layout.rawSettings?.ctaConfig} />
+  //         <CtaFloatingButtons ctaConfig={layout.rawSettings?.ctaConfig} />
   //       </body>
   //     </html>
   //   );

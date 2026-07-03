@@ -929,7 +929,7 @@ export default function SettingsEditor({ siteId, initialSettings }) {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Sticky Header Toggle */}
                 <div className="flex items-center justify-between border p-4 rounded-xl bg-gray-50/50">
                   <div>
@@ -989,28 +989,6 @@ export default function SettingsEditor({ siteId, initialSettings }) {
                       type="checkbox"
                       name="borderBottom"
                       checked={header.borderBottom !== false}
-                      onChange={handleHeaderChange}
-                      className="sr-only peer"
-                    />
-                    <div className="w-8 h-4 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-100"></div>
-                  </label>
-                </div>
-
-                {/* Show Search Toggle */}
-                <div className="flex items-center justify-between border p-4 rounded-xl bg-gray-50/50">
-                  <div>
-                    <h5 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
-                      Search Utility
-                    </h5>
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      Display search button.
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="showSearch"
-                      checked={!!header.showSearch}
                       onChange={handleHeaderChange}
                       className="sr-only peer"
                     />
@@ -1347,26 +1325,6 @@ export default function SettingsEditor({ siteId, initialSettings }) {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border p-4 rounded-xl bg-gray-50/50 max-w-sm mt-4">
-                <div>
-                  <h5 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
-                    Newsletter Widget
-                  </h5>
-                  <p className="text-[10px] text-gray-400 mt-0.5">
-                    Show newsletter subscription block in footer columns.
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    name="showNewsletter"
-                    checked={!!footer.showNewsletter}
-                    onChange={handleFooterChange}
-                    className="sr-only peer"
-                  />
-                  <div className="w-8 h-4 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-100"></div>
-                </label>
-              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
                 {/* Footer Background Color */}

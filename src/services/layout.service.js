@@ -37,7 +37,8 @@ export async function getLayoutData() {
           compliance: true,
           analytics: true,
           securityControls: true,
-          emailSettings: true
+          emailSettings: true,
+          ctaConfig: true
         }
       }),
       prisma.legalPage.findMany({

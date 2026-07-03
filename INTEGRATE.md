@@ -123,6 +123,7 @@ Open `src/app/layout.js`. At the bottom, find the `// ── Public site layout`
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getLayoutData } from "@/services/layout.service";
+import { CookieConsentBanner, CtaPopups, CtaFloatingButtons } from "@yourcompany/global-backend-next/components";
 
 // ... (inside RootLayout, the public path branch):
 
@@ -133,10 +134,17 @@ return (
     <head>
       <link rel="icon" href={layout.faviconUrl} />
     </head>
-    <body>
+    <body className="flex min-h-full flex-col bg-slate-50">
       <Header navigation={layout.navigation} logoUrl={layout.logoUrl} />
-      <main>{children}</main>
+      <main className="flex-grow flex flex-col">{children}</main>
       <Footer navigation={layout.navigation} copyright={layout.copyright} />
+      <CookieConsentBanner
+        complianceSettings={layout.rawSettings?.compliance}
+        siteId={process.env.NEXT_PUBLIC_SITE_ID}
+        baseUrl={process.env.NEXT_PUBLIC_CMS_BASE_URL}
+      />
+      <CtaPopups ctaConfig={layout.rawSettings?.ctaConfig} />
+      <CtaFloatingButtons ctaConfig={layout.rawSettings?.ctaConfig} />
     </body>
   </html>
 );
