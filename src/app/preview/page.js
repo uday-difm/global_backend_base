@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import ContactFormSection from "@/components/ContactFormSection";
+import { redirect } from "next/navigation";
 
 const FALLBACK_SERVICES = [
   { id: "s1", title: "Business Funding Consulting", description: "Get guidance on merchant cash advances and alternative business loans.", price: "250" },
@@ -670,8 +671,6 @@ export default async function PreviewPage({ searchParams }) {
       </div>
     );
   }
-
-import { redirect } from "next/navigation";
 
 // Fetch page directly with Prisma
   const page = await prisma.page.findUnique({
