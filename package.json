@@ -33,6 +33,7 @@
     "@tiptap/pm": "^3.27.1",
     "@tiptap/react": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
+    "@yourcompany/global-backend-next": "file:src/sdk/yourcompany-global-backend-next-1.0.6.tgz",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "dns": "^0.2.2",
