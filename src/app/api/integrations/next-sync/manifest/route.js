@@ -137,7 +137,23 @@ export async function POST(req) {
     const updated = [];
     const syncedRoutes = [];
 
-    for (const r of parsed.routes) {
+    // Filter out system, administrative, and auth routes
+    const systemRoutePatterns = [
+      /^\/admin(\/|$)/i,
+      /^\/crm(\/|$)/i,
+      /^\/login(\/|$)/i,
+      /^\/forgot-password(\/|$)/i,
+      /^\/reset-password(\/|$)/i,
+      /^\/preview(\/|$)/i,
+      /^\/maintenance(\/|$)/i,
+    ];
+
+    const filteredRoutes = parsed.routes.filter((r) => {
+      const slug = r.slug.startsWith("/") ? r.slug : `/${r.slug}`;
+      return !systemRoutePatterns.some((pattern) => pattern.test(slug));
+    });
+
+    for (const r of filteredRoutes) {
       const slug = r.slug.startsWith("/") ? r.slug : `/${r.slug}`;
       // Also check without leading slash, e.g. "about" for pages stored as "about"
       const slugBare = slug.replace(/^\//, "");
@@ -215,7 +231,7 @@ export async function POST(req) {
 
     // ── Cleanup: delete synced pages that no longer exist in the frontend ──
     const incomingSlugs = new Set(
-      parsed.routes.map((r) =>
+      filteredRoutes.map((r) =>
         r.slug.startsWith("/") ? r.slug : `/${r.slug}`,
       ),
     );
