@@ -8,6 +8,7 @@ import DeletePageButton from "./DeletePageButton";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/requireAuth";
 import { getSiteForUser } from "@/lib/getSiteForUser";
+import { headers } from "next/headers";
 import {
   FileText,
   Eye,
@@ -23,18 +24,21 @@ export const metadata = {
     "Create pages, edit layouts, modify text/images, and toggle publishing statuses.",
 };
 
-function resolveFrontendUrl(value) {
+function resolveFrontendUrl(value, requestHost) {
   const fallback = process.env.FRONTEND_URL || "http://localhost:3001";
+
+  if (requestHost) {
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    if (!value || value.includes("localhost") || value.includes("127.0.0.1")) {
+      return `${protocol}://${requestHost}`;
+    }
+  }
+
   const raw = (value || fallback).trim();
   const withProtocol = /^https?:\/\//i.test(raw) ? raw : `http://${raw}`;
 
   try {
     const url = new URL(withProtocol);
-
-    if (url.port === "3000") {
-      return fallback.replace(/\/+$/, "");
-    }
-
     return url.href.replace(/\/+$/, "");
   } catch {
     return fallback.replace(/\/+$/, "");
@@ -64,7 +68,11 @@ export default async function PagesAdmin() {
     where: { siteId: site.id },
     select: { websiteSettings: true },
   });
-  const frontendUrl = resolveFrontendUrl(settings?.websiteSettings?.domain);
+  const requestHeaders = await headers();
+  const frontendUrl = resolveFrontendUrl(
+    settings?.websiteSettings?.domain,
+    requestHeaders.get("host")
+  );
 
   // Retrieve all pages under this site
   const pages = await prisma.page.findMany({
@@ -182,9 +190,14 @@ export default async function PagesAdmin() {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded border">
+                    <a
+                      href={`${frontendUrl}${p.slug || "/"}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-indigo-600 hover:text-indigo-800 bg-gray-50 px-2 py-1 rounded border hover:bg-indigo-50/10 transition"
+                    >
                       {p.slug || "/"}
-                    </span>
+                    </a>
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -221,7 +234,7 @@ export default async function PagesAdmin() {
 
                     {/* Preview button */}
                     <a
-                      href={`/preview?pageId=${p.id}&siteId=${site.id}`}
+                      href={`${frontendUrl}/preview?pageId=${p.id}&siteId=${site.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold shadow-sm transition"
