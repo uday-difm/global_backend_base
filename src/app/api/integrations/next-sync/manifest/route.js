@@ -243,7 +243,7 @@ export async function POST(req) {
     const deleted = [];
     for (const sr of existingSyncedRoutes) {
       if (!incomingSlugs.has(sr.route) && sr.pageId) {
-        await prisma.page.update({
+        await prisma.page.updateMany({
           where: { id: sr.pageId },
           data: { deletedAt: new Date() },
         });
