@@ -24,9 +24,16 @@ Everything else (`/`, your pages) is your frontend.
 
 ### 1. Copy this folder
 
+**For a brand-new project:**
 ```bash
 cp -r global-backend-base my-new-site
 cd my-new-site
+```
+
+**For merging into an existing project folder:**
+```bash
+# Copies all files (including hidden ones) directly into your project
+cp -r global-backend-base/* global-backend-base/.* my-existing-site/
 ```
 
 ### 2. Rename the project
