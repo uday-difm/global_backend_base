@@ -254,28 +254,19 @@ export async function POST(req) {
     });
 
     let lead = null;
-    // Only create a Lead record when the submission explicitly indicates interest
-    // in a specific service (e.g. "Free Consultation", "Case Evaluation").
-    // Generic contact form messages go only to submissions.
-    const isLeadIntent =
-      message?.toLowerCase().includes("consultation") ||
-      message?.toLowerCase().includes("case evaluation") ||
-      message?.toLowerCase().includes("quote") ||
-      message?.toLowerCase().includes("estimate");
-    if (isLeadIntent) {
-      lead = await prisma.lead.create({
-        data: {
-          siteId,
-          name,
-          email,
-          phone,
-          serviceInterest: "Contact Form Submission",
-          sourcePage: "Contact Page",
-          status: "new",
-          notes: `Form Message: ${message}`,
-        },
-      });
-    }
+    // Create a Lead record for every contact form submission so it flows into the CRM Leads dashboard.
+    lead = await prisma.lead.create({
+      data: {
+        siteId,
+        name,
+        email,
+        phone,
+        serviceInterest: "Contact Form Submission",
+        sourcePage: "Contact Page",
+        status: "new",
+        notes: `Form Message: ${message}`,
+      },
+    });
 
     // Sync newsletter subscribers when submission is a newsletter signup
     const isNewsletter =

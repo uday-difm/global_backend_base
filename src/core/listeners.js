@@ -22,6 +22,8 @@ EventBus.on("auth.password_reset_requested", async ({ email, token }) => {
 
 EventBus.on("contact_form.submitted", async ({ submission, lead, site }) => {
   console.log("🔥 [EventBus] contact_form.submitted received for site:", submission.siteId);
+
+  // ── Email alerts ────────────────────────────────────────────────────────
   try {
     await emailService.sendContactFormAlerts(submission, lead, site);
     console.log("✅ [EventBus] Contact form email alerts sent.");
@@ -29,21 +31,25 @@ EventBus.on("contact_form.submitted", async ({ submission, lead, site }) => {
     console.error("❌ [EventBus] Failed to send contact form alerts via listener:", err);
   }
 
-  if (!lead) {
-    try {
-      console.log("🔥 [EventBus] Generic submission - writing NotificationAlert to DB...");
-      const alert = await prisma.notificationAlert.create({
-        data: {
-          siteId: submission.siteId,
-          title: "New Contact Message",
-          message: `From: ${submission.name} (${submission.email}). Message: ${submission.message.substring(0, 100)}${submission.message.length > 100 ? "..." : ""}`,
-          type: "NEW_LEAD",
-        },
-      });
-      console.log("✅ [EventBus] NotificationAlert created in DB:", alert.id);
-    } catch (err) {
-      console.error("❌ [EventBus] Failed to log generic contact submission dashboard alert:", err);
-    }
+  // ── Dashboard notification (always — admin + CRM bell) ───────────────────
+  try {
+    const isLead = !!lead;
+    const title = isLead ? "New Lead from Contact Form" : "New Contact Form Submission";
+    const msg = isLead
+      ? `Lead: ${lead.name} (${lead.email}) — Interest: ${lead.serviceInterest || "N/A"}`
+      : `From: ${submission.name} (${submission.email}) — ${submission.message.substring(0, 120)}${submission.message.length > 120 ? "..." : ""}`;
+
+    await prisma.notificationAlert.create({
+      data: {
+        siteId: submission.siteId,
+        title,
+        message: msg,
+        type: "NEW_LEAD",
+      },
+    });
+    console.log("✅ [EventBus] NotificationAlert created in DB.");
+  } catch (err) {
+    console.error("❌ [EventBus] Failed to create dashboard NotificationAlert:", err);
   }
 });
 

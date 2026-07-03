@@ -142,6 +142,12 @@ const crmSections = [
         icon: Mail,
         minRole: "ADMIN",
       },
+      {
+        href: "/admin/notifications",
+        label: "Notification Settings",
+        icon: Bell,
+        minRole: "ADMIN",
+      },
     ],
   },
 ];
