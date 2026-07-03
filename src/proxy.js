@@ -44,7 +44,7 @@ function shouldSkipMaintenanceCheck(pathname) {
   return false;
 }
 
-export async function middleware(request) {
+export async function proxy(request) {
   const origin = request.headers.get("origin") || "*";
   const url = new URL(request.url);
   const pathname = url.pathname;
@@ -107,7 +107,7 @@ export async function middleware(request) {
   }
 
   // --------------- Maintenance Mode Check (public pages only) ---------------
-  if (!shouldSkipMaintenanceCheck(pathname)) {
+  if (!shouldSkipMaintenanceCheck(pathname) && process.env.NODE_ENV !== "development") {
     try {
       const settingsRes = await fetch(
         `${url.origin}/api/settings?siteId=${encodeURIComponent(siteId)}`,
@@ -143,7 +143,8 @@ export async function middleware(request) {
     !pathname.startsWith("/api/") &&
     !pathname.startsWith("/_next") &&
     !pathname.startsWith("/maintenance") &&
-    !isAdminPath
+    !isAdminPath &&
+    process.env.NODE_ENV !== "development"
   ) {
     try {
       const redirectRes = await fetch(

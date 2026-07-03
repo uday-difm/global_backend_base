@@ -3,6 +3,6 @@ export async function register() {
     const { register: backendRegister } = await import(
       "@yourcompany/global-backend-next/instrumentation"
     );
-    await backendRegister();
+    backendRegister();
   }
 }

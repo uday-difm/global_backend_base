@@ -23,8 +23,13 @@ const nextConfig = {
         crypto: false,
       };
     }
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push("jsdom", "isomorphic-dompurify");
+    }
     return config;
   },
+  turbopack: {},
 };
 
 export default nextConfig;
