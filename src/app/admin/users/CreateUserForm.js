@@ -17,6 +17,8 @@ const ROLE_LEVEL = {
   ADMIN: 4,
   EDITOR: 3,
   AUTHOR: 2,
+  MARKETING: 1,
+  VISITOR: 1,
   VIEWER: 1,
 };
 
@@ -102,7 +104,7 @@ export default function CreateUserForm({ sites = [] }) {
     };
   }, []);
 
-  const allRoles = ["SUPERADMIN", "ADMIN", "EDITOR", "AUTHOR", "VIEWER"];
+  const allRoles = ["SUPERADMIN", "ADMIN", "EDITOR", "AUTHOR", "MARKETING", "VISITOR", "VIEWER"];
   const allowedRoles = creatorRole
     ? allRoles.filter(
         (r) => (ROLE_LEVEL[r] || 0) <= (ROLE_LEVEL[creatorRole] || 0),

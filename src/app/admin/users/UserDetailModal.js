@@ -310,6 +310,8 @@ export default function UserDetailModal({ userId }) {
                             <option value="ADMIN">ADMIN</option>
                             <option value="EDITOR">EDITOR</option>
                             <option value="AUTHOR">AUTHOR</option>
+                            <option value="MARKETING">MARKETING</option>
+                            <option value="VISITOR">VISITOR</option>
                             <option value="VIEWER">VIEWER</option>
                           </select>
                         </div>

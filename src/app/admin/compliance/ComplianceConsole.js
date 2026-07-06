@@ -94,7 +94,7 @@ export default function ComplianceConsole({
           essentialCookiesEnabled: true,
           analyticsCookiesEnabled,
           marketingCookiesEnabled,
-          bannerPosition,
+          bannerPosition: "bottom",
           acceptButtonText,
           declineButtonText,
           settingsButtonText,
@@ -480,21 +480,6 @@ export default function ComplianceConsole({
 
             {/* Layout Positioning */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-800 uppercase block">
-                  Banner Position
-                </label>
-                <select
-                  value={bannerPosition}
-                  onChange={(e) => setBannerPosition(e.target.value)}
-                  className="w-full text-xs border border-gray-200 rounded-lg p-2.5 outline-none bg-white focus:border-indigo-600"
-                >
-                  <option value="bottom">Sticky Bottom Banner</option>
-                  <option value="top">Sticky Top Banner</option>
-                  <option value="popup">Center Modal Popup</option>
-                </select>
-              </div>
-
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-800 uppercase block">
                   Accept Button Label

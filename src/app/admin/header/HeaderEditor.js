@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Save, AlertCircle, CheckCircle2, Layout, Smartphone, HelpCircle, Eye, EyeOff } from "lucide-react";
+import MediaPickerModal from "@/components/media/MediaPickerModal";
 
 export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], navigation = {} }) {
   const defaultConfig = {
@@ -49,6 +50,15 @@ export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], na
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+
+  const handleMediaSelect = (media) => {
+    setConfig(prev => ({
+      ...prev,
+      logoUrl: media.secureUrl || media.url
+    }));
+    setShowMediaPicker(false);
+  };
 
   // Active editor tab: "logo_layout", "announcement", "cta_menu", "mobile"
   const [activeTab, setActiveTab] = useState("logo_layout");
@@ -268,14 +278,23 @@ export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], na
                 <>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Logo Image URL</label>
-                    <input
-                      type="text"
-                      required
-                      value={config.logoUrl}
-                      onChange={(e) => setConfig(prev => ({ ...prev, logoUrl: e.target.value }))}
-                      className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs font-mono"
-                      placeholder="/next.svg"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        required
+                        value={config.logoUrl}
+                        onChange={(e) => setConfig(prev => ({ ...prev, logoUrl: e.target.value }))}
+                        className="flex-1 rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs font-mono"
+                        placeholder="/next.svg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowMediaPicker(true)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 text-xs rounded-lg border border-gray-300 transition"
+                      >
+                        Select Media
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -303,97 +322,15 @@ export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], na
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Logo Title Text</label>
                   <input
-                    type="text"
-                    required
-                    value={config.logoText}
-                    onChange={(e) => setConfig(prev => ({ ...prev, logoText: e.target.value }))}
-                    className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs font-semibold"
-                    placeholder="MySite Title"
+                     type="text"
+                     required
+                     value={config.logoText}
+                     onChange={(e) => setConfig(prev => ({ ...prev, logoText: e.target.value }))}
+                     className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs font-semibold"
+                     placeholder="MySite Title"
                   />
                 </div>
               )}
-
-              <div className="border-t pt-3 space-y-4">
-                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Styling & Positioning</h4>
-                
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Header Layout preset</label>
-                  <select
-                    value={config.layout}
-                    onChange={(e) => setConfig(prev => ({ ...prev, layout: e.target.value }))}
-                    className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs bg-white font-semibold"
-                  >
-                    <option value="logo-left">Logo Left, Nav Centered, CTA Right</option>
-                    <option value="logo-center">Logo Center, Nav Left, CTA Right</option>
-                    <option value="logo-split">Split Header (Logo Center, Nav split)</option>
-                    <option value="logo-right">Logo Right, Nav Left, CTA Center</option>
-                    <option value="stacked">Stacked Centered (Logo Top, Nav+CTA Bottom)</option>
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Vertical Height Padding</label>
-                    <select
-                      value={config.paddingY}
-                      onChange={(e) => setConfig(prev => ({ ...prev, paddingY: e.target.value }))}
-                      className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs bg-white"
-                    >
-                      <option value="small">Small Padding</option>
-                      <option value="medium">Medium Padding</option>
-                      <option value="large">Large Padding</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bottom Drop Shadow</label>
-                    <select
-                      value={config.shadowSize}
-                      onChange={(e) => setConfig(prev => ({ ...prev, shadowSize: e.target.value }))}
-                      className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs bg-white"
-                    >
-                      <option value="none">No Shadow</option>
-                      <option value="small">Small Shadow</option>
-                      <option value="medium">Medium Shadow</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pt-1">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="sticky"
-                      checked={config.sticky}
-                      onChange={(e) => setConfig(prev => ({ ...prev, sticky: e.target.checked }))}
-                      className="rounded text-indigo-600 h-4 w-4"
-                    />
-                    <label htmlFor="sticky" className="text-xs font-bold text-gray-700">Sticky Header</label>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="transparent"
-                      checked={config.transparent}
-                      onChange={(e) => setConfig(prev => ({ ...prev, transparent: e.target.checked }))}
-                      className="rounded text-indigo-600 h-4 w-4"
-                    />
-                    <label htmlFor="transparent" className="text-xs font-bold text-gray-700">Transparent Overlay</label>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="borderBottom"
-                      checked={config.borderBottom}
-                      onChange={(e) => setConfig(prev => ({ ...prev, borderBottom: e.target.checked }))}
-                      className="rounded text-indigo-600 h-4 w-4"
-                    />
-                    <label htmlFor="borderBottom" className="text-xs font-bold text-gray-700">Bottom Border</label>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -433,28 +370,6 @@ export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], na
                       className="w-full rounded-lg border border-gray-200 p-2.5 outline-none focus:border-indigo-600 text-xs font-mono"
                       placeholder="/blogs"
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Background Color</label>
-                      <input
-                        type="color"
-                        value={config.announcementBar.bgColor}
-                        onChange={(e) => updateAnnouncementField("bgColor", e.target.value)}
-                        className="w-full h-10 rounded-lg cursor-pointer border border-gray-200"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Text Color</label>
-                      <input
-                        type="color"
-                        value={config.announcementBar.textColor}
-                        onChange={(e) => updateAnnouncementField("textColor", e.target.value)}
-                        className="w-full h-10 rounded-lg cursor-pointer border border-gray-200"
-                      />
-                    </div>
                   </div>
                 </>
               )}
@@ -779,6 +694,14 @@ export default function HeaderEditor({ siteId, initialConfig, menuTypes = [], na
           </div>
         </div>
       </div>
+      {showMediaPicker && (
+        <MediaPickerModal
+          siteId={siteId}
+          filter="images"
+          onSelect={handleMediaSelect}
+          onClose={() => setShowMediaPicker(false)}
+        />
+      )}
     </form>
   );
 }
