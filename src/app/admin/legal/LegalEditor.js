@@ -296,7 +296,7 @@ export default function LegalEditor({ siteId, initialPages }) {
       <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[620px]">
         {/* Editor Toolbar */}
         <div className="bg-gray-50/60 border-b border-gray-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h3 className="font-bold text-gray-900 text-base">
               Editing: {POLICY_TYPES.find((p) => p.type === activeTab).label}
             </h3>
@@ -307,6 +307,11 @@ export default function LegalEditor({ siteId, initialPages }) {
               {isPublished ? <Globe size={10} /> : <EyeOff size={10} />}
               {activeStatus.label}
             </span>
+            {activeStatus.date && (
+              <span className="text-[11px] text-gray-400 font-mono">
+                (Last Saved: {activeStatus.date})
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
