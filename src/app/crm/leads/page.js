@@ -12,7 +12,7 @@ export const metadata = {
 export default async function LeadsPage() {
   const user = await requireAuth();
   if (!user) return null;
-  if (user.globalRole === "VIEWER") redirect("/admin/dashboard");
+  if (user.globalRole === "VIEWER") redirect("/dashboard/dashboard");
 
   const site = await getSiteForUser(user);
 

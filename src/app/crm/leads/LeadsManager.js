@@ -62,7 +62,7 @@ function SubmissionsTab({ siteId, submissions, setSubmissions }) {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/forms/submissions/${selected.id}`, {
+      const res = await fetch(`/api/dashboard/forms/submissions/${selected.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-site-id": siteId },
         body: JSON.stringify({ status, notes }),
@@ -82,7 +82,7 @@ function SubmissionsTab({ siteId, submissions, setSubmissions }) {
   const handleDelete = async (id) => {
     if (!confirm("Delete this submission permanently?")) return;
     try {
-      const res = await fetch(`/api/admin/forms/submissions/${id}`, {
+      const res = await fetch(`/api/dashboard/forms/submissions/${id}`, {
         method: "DELETE",
         headers: { "x-site-id": siteId },
       });
@@ -120,7 +120,7 @@ function SubmissionsTab({ siteId, submissions, setSubmissions }) {
           </select>
         </div>
         <a
-          href={`/api/admin/forms/export?siteId=${siteId}`}
+          href={`/api/dashboard/forms/export?siteId=${siteId}`}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white text-xs font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
         >
           <Download size={13} /> Export CSV
@@ -288,7 +288,7 @@ function LeadsTab({ siteId, leads, setLeads }) {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/leads/${selected.id}`, {
+      const res = await fetch(`/api/dashboard/leads/${selected.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-site-id": siteId },
         body: JSON.stringify({ status, notes }),
@@ -308,7 +308,7 @@ function LeadsTab({ siteId, leads, setLeads }) {
   const handleDelete = async (id) => {
     if (!confirm("Delete this lead permanently?")) return;
     try {
-      const res = await fetch(`/api/admin/leads/${id}`, {
+      const res = await fetch(`/api/dashboard/leads/${id}`, {
         method: "DELETE",
         headers: { "x-site-id": siteId },
       });
@@ -345,7 +345,7 @@ function LeadsTab({ siteId, leads, setLeads }) {
           </select>
         </div>
         <a
-          href={`/api/admin/leads/export?siteId=${siteId}`}
+          href={`/api/dashboard/leads/export?siteId=${siteId}`}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white text-xs font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
         >
           <Download size={13} /> Export CSV
@@ -468,7 +468,7 @@ function SpamTab({ siteId, initialConfig }) {
     setMsg(null);
     const keywordList = keywords.split(",").map((k) => k.trim()).filter(Boolean);
     try {
-      const res = await fetch(`/api/admin/forms/config?siteId=${siteId}`, {
+      const res = await fetch(`/api/dashboard/forms/config?siteId=${siteId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-site-id": siteId },
         body: JSON.stringify({

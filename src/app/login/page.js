@@ -69,7 +69,7 @@ function LoginAndProjectLanding() {
   // If already authenticated, go straight to dashboard
   useEffect(() => {
     if (status === "authenticated") {
-      const callbackUrl = searchParams.get("callbackUrl") || "/admin/dashboard";
+      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/dashboard";
       router.replace(callbackUrl);
     }
   }, [status, router, searchParams]);
@@ -136,7 +136,7 @@ function LoginAndProjectLanding() {
         setLoading(false);
       } else {
         // Successful login, route to callbackUrl
-        const callbackUrl = searchParams.get("callbackUrl") || "/admin/dashboard";
+        const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/dashboard";
         router.replace(callbackUrl);
       }
     } catch (err) {

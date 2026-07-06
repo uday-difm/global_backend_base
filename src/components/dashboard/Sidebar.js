@@ -143,7 +143,7 @@ const crmSections = [
         minRole: "ADMIN",
       },
       {
-        href: "/admin/notifications",
+        href: "/dashboard/notifications",
         label: "Notification Settings",
         icon: Bell,
         minRole: "ADMIN",
@@ -157,7 +157,7 @@ const sections = [
     title: "Management",
     links: [
       {
-        href: "/admin/sites",
+        href: "/dashboard/sites",
         label: "Sites",
         icon: Globe,
         minRole: "ADMIN",
@@ -168,7 +168,7 @@ const sections = [
     title: "Overview",
     links: [
       {
-        href: "/admin/dashboard",
+        href: "/dashboard/dashboard",
         label: "Dashboard",
         icon: LayoutDashboard,
         minRole: "VIEWER",
@@ -180,31 +180,31 @@ const sections = [
     title: "Content",
     links: [
       {
-        href: "/admin/pages",
+        href: "/dashboard/pages",
         label: "Pages",
         icon: FileText,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/blogs",
+        href: "/dashboard/blogs",
         label: "Blogs",
         icon: Newspaper,
         minRole: "AUTHOR",
       },
       {
-        href: "/admin/services",
+        href: "/dashboard/services",
         label: "Services",
         icon: Briefcase,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/media",
+        href: "/dashboard/media",
         label: "Media",
         icon: ImageIcon,
         minRole: "AUTHOR",
       },
       {
-        href: "/admin/quizzes",
+        href: "/dashboard/quizzes",
         label: "Quizzes",
         icon: HelpCircle,
         minRole: "EDITOR",
@@ -216,43 +216,43 @@ const sections = [
     title: "Website",
     links: [
       {
-        href: "/admin/navigation",
+        href: "/dashboard/navigation",
         label: "Navigation",
         icon: Menu,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/header",
+        href: "/dashboard/header",
         label: "Header Builder",
         icon: PanelTop,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/footer",
+        href: "/dashboard/footer",
         label: "Footer Builder",
         icon: PanelBottom,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/cta",
+        href: "/dashboard/cta",
         label: "CTA & Popups",
         icon: Megaphone,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/seo",
+        href: "/dashboard/seo",
         label: "SEO",
         icon: BarChart2,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/contact",
+        href: "/dashboard/contact",
         label: "Contact",
         icon: Phone,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/legal",
+        href: "/dashboard/legal",
         label: "Legal Pages",
         icon: Scale,
         minRole: "EDITOR",
@@ -264,19 +264,19 @@ const sections = [
     title: "People",
     links: [
       {
-        href: "/admin/team",
+        href: "/dashboard/team",
         label: "Team",
         icon: UsersRound,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/testimonials",
+        href: "/dashboard/testimonials",
         label: "Testimonials",
         icon: Quote,
         minRole: "EDITOR",
       },
       {
-        href: "/admin/faq",
+        href: "/dashboard/faq",
         label: "FAQs",
         icon: HelpCircle,
         minRole: "EDITOR",
@@ -288,25 +288,25 @@ const sections = [
     title: "System",
     links: [
       {
-        href: "/admin/users",
+        href: "/dashboard/users",
         label: "Users",
         icon: Users,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/security",
+        href: "/dashboard/security",
         label: "Security",
         icon: ShieldCheck,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/redirects",
+        href: "/dashboard/redirects",
         label: "Redirects",
         icon: ArrowLeftRight,
         minRole: "ADMIN",
       },
       {
-        href: "/admin/notifications",
+        href: "/dashboard/notifications",
         label: "Notifications",
         icon: Bell,
         minRole: "ADMIN",
@@ -321,7 +321,7 @@ function canSee(userRole, minRole) {
 
 function SidebarLink({ href, label, icon: Icon, pathname }) {
   const isActive =
-    pathname === href || (href !== "/admin/dashboard" && pathname.startsWith(href));
+    pathname === href || (href !== "/dashboard/dashboard" && pathname.startsWith(href));
 
   return (
     <Link
@@ -352,7 +352,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   const userRole = session?.user?.globalRole || "VIEWER";
   const isCrmMode = pathname.startsWith("/crm");
-  const isAdminMode = pathname.startsWith("/admin");
+  const isDashboardMode = pathname.startsWith("/dashboard");
   const activeSections = isCrmMode ? crmSections : sections;
 
   return (
@@ -427,35 +427,35 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                {advancedOpen && (
                 <div className="mt-1 space-y-0.5">
                   <SidebarLink
-                    href="/admin/backup"
+                    href="/dashboard/backup"
                     label="Backup & Restore"
                     icon={Database}
                     pathname={pathname}
                   />
 
                   <SidebarLink
-                    href="/admin/compliance"
+                    href="/dashboard/compliance"
                     label="Compliance"
                     icon={Fingerprint}
                     pathname={pathname}
                   />
 
                   <SidebarLink
-                    href="/admin/performance"
+                    href="/dashboard/performance"
                     label="Performance"
                     icon={Activity}
                     pathname={pathname}
                   />
 
                   <SidebarLink
-                    href="/admin/dev"
+                    href="/dashboard/dev"
                     label="Developer Tools"
                     icon={Terminal}
                     pathname={pathname}
                   />
 
                   <SidebarLink
-                    href="/admin/settings"
+                    href="/dashboard/settings"
                     label="Settings"
                     icon={Settings}
                     pathname={pathname}

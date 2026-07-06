@@ -29,9 +29,9 @@ export const viewport = {
  * Paths that render the admin/CRM shell instead of the public site layout.
  * Do NOT modify this unless adding a new admin-only route segment.
  */
-function isAdminPath(pathname) {
+function isDashboardPath(pathname) {
   return (
-    pathname.startsWith("/admin") ||
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/crm") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/forgot-password") ||
@@ -47,7 +47,7 @@ export default async function RootLayout({ children }) {
 
   // ── Admin / CRM / Auth shell ────────────────────────────────────────────
   // Rendered for /admin, /crm, /login, /forgot-password, /reset-password, /preview
-  if (isAdminPath(pathname)) {
+  if (isDashboardPath(pathname)) {
     return (
       <html lang="en" suppressHydrationWarning>
         <head />

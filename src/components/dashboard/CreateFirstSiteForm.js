@@ -16,7 +16,7 @@ export default function CreateFirstSiteForm() {
     setError("");
 
     try {
-      const res = await fetch("/api/admin/sites", {
+      const res = await fetch("/api/dashboard/sites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, domain: domain || null }),

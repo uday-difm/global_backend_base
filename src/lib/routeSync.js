@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 const SITE_ID = "ebh";
 
 const EXCLUDED_PREFIXES = [
-  "/admin",
+  "/dashboard",
   "/crm",
   "/api",
   "/preview",

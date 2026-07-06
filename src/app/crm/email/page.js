@@ -18,7 +18,7 @@ export default async function EmailSettingsPage() {
   }
 
   if (user.globalRole !== "SUPERADMIN" && user.globalRole !== "ADMIN") {
-    redirect("/admin/dashboard");
+    redirect("/dashboard/dashboard");
   }
 
   // Fetch the existing email settings

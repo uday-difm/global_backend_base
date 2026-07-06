@@ -38,8 +38,8 @@ export default function AdsPage() {
     setSaveError(null);
     try {
       const [adsRes, zonesRes] = await Promise.all([
-        fetch("/api/admin/ads", { headers: { "x-site-id": siteId } }),
-        fetch("/api/admin/ads/zones", { headers: { "x-site-id": siteId } })
+        fetch("/api/dashboard/ads", { headers: { "x-site-id": siteId } }),
+        fetch("/api/dashboard/ads/zones", { headers: { "x-site-id": siteId } })
       ]);
       if (adsRes.ok && zonesRes.ok) {
         const adsData = await adsRes.json().catch(() => ({}));
@@ -58,7 +58,7 @@ export default function AdsPage() {
     e.preventDefault();
     setSaveError(null);
     try {
-      const res = await fetch("/api/admin/ads/zones", {
+      const res = await fetch("/api/dashboard/ads/zones", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export default function AdsPage() {
     e.preventDefault();
     setSaveError(null);
     try {
-      const res = await fetch("/api/admin/ads", {
+      const res = await fetch("/api/dashboard/ads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export default function AdsPage() {
   const handleDeleteAd = async (id) => {
     if (!confirm("Are you sure you want to delete this ad?")) return;
     try {
-      const res = await fetch(`/api/admin/ads/${id}`, {
+      const res = await fetch(`/api/dashboard/ads/${id}`, {
         method: "DELETE",
         headers: { "x-site-id": siteId }
       });

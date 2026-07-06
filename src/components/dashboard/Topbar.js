@@ -41,7 +41,7 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
   const fetchAlerts = async () => {
     if (!siteId) return;
     try {
-      const res = await fetch("/api/admin/notifications", {
+      const res = await fetch("/api/dashboard/notifications", {
         headers: {
           "x-site-id": siteId,
         },
@@ -92,7 +92,7 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
   const handleMarkAllRead = async () => {
     if (!siteId) return;
     try {
-      const res = await fetch("/api/admin/notifications/read", {
+      const res = await fetch("/api/dashboard/notifications/read", {
         method: "PUT",
         headers: {
           "x-site-id": siteId,
@@ -110,7 +110,7 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
   const handleClearAll = async () => {
     if (!siteId) return;
     try {
-      const res = await fetch("/api/admin/notifications", {
+      const res = await fetch("/api/dashboard/notifications", {
         method: "DELETE",
         headers: {
           "x-site-id": siteId,
@@ -139,26 +139,26 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
   };
 
   const searchItems = [
-    { name: "Dashboard", href: "/admin/dashboard" },
-    { name: "Pages", href: "/admin/pages" },
-    { name: "Blogs", href: "/admin/blogs" },
-    { name: "Services", href: "/admin/services" },
-    { name: "Media Library", href: "/admin/media" },
+    { name: "Dashboard", href: "/dashboard/dashboard" },
+    { name: "Pages", href: "/dashboard/pages" },
+    { name: "Blogs", href: "/dashboard/blogs" },
+    { name: "Services", href: "/dashboard/services" },
+    { name: "Media Library", href: "/dashboard/media" },
     { name: "Leads CRM", href: "/crm/leads" },
     { name: "Visitor Analytics", href: "/crm/visitors" },
-    { name: "Users", href: "/admin/users" },
-    { name: "Settings", href: "/admin/settings" },
-    { name: "Testimonials", href: "/admin/testimonials" },
-    { name: "FAQs", href: "/admin/faq" },
-    { name: "Team Members", href: "/admin/team" },
-    { name: "Contact Details", href: "/admin/contact" },
-    { name: "Legal Pages", href: "/admin/legal" },
-    { name: "Navigation Menus", href: "/admin/navigation" },
-    { name: "Header Builder", href: "/admin/header" },
-    { name: "Footer Builder", href: "/admin/footer" },
-    { name: "CTA & Popups", href: "/admin/cta" },
-    { name: "Notifications", href: "/admin/notifications" },
-    { name: "Security Center", href: "/admin/security" },
+    { name: "Users", href: "/dashboard/users" },
+    { name: "Settings", href: "/dashboard/settings" },
+    { name: "Testimonials", href: "/dashboard/testimonials" },
+    { name: "FAQs", href: "/dashboard/faq" },
+    { name: "Team Members", href: "/dashboard/team" },
+    { name: "Contact Details", href: "/dashboard/contact" },
+    { name: "Legal Pages", href: "/dashboard/legal" },
+    { name: "Navigation Menus", href: "/dashboard/navigation" },
+    { name: "Header Builder", href: "/dashboard/header" },
+    { name: "Footer Builder", href: "/dashboard/footer" },
+    { name: "CTA & Popups", href: "/dashboard/cta" },
+    { name: "Notifications", href: "/dashboard/notifications" },
+    { name: "Security Center", href: "/dashboard/security" },
   ];
 
   const filteredItems = searchQuery
@@ -210,7 +210,7 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
                     const newSiteId = e.target.value;
                     if (!newSiteId || newSiteId === siteId) return;
                     try {
-                      const res = await fetch("/api/admin/switch-site", {
+                      const res = await fetch("/api/dashboard/switch-site", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ siteId: newSiteId }),

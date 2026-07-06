@@ -133,7 +133,7 @@ export default function EmailEditor({ siteId, initialEmailSettings }) {
     };
 
     try {
-      const res = await fetch("/api/admin/email/smtp", {
+      const res = await fetch("/api/dashboard/email/smtp", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export default function EmailEditor({ siteId, initialEmailSettings }) {
     setMessage(null);
 
     try {
-      const res = await fetch("/api/admin/email/smtp/test", {
+      const res = await fetch("/api/dashboard/email/smtp/test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ export default function EmailEditor({ siteId, initialEmailSettings }) {
       }
 
       // Re-fetch failed logs in case a log occurred before succeeding or during trial
-      const logRes = await fetch(`/api/admin/email/failed-logs`, {
+      const logRes = await fetch(`/api/dashboard/email/failed-logs`, {
         headers: { "x-site-id": siteId },
       });
       if (logRes.ok) {
@@ -199,7 +199,7 @@ export default function EmailEditor({ siteId, initialEmailSettings }) {
       });
 
       // Sync failed logs
-      const logRes = await fetch(`/api/admin/email/failed-logs`, {
+      const logRes = await fetch(`/api/dashboard/email/failed-logs`, {
         headers: { "x-site-id": siteId },
       });
       if (logRes.ok) {
@@ -219,7 +219,7 @@ export default function EmailEditor({ siteId, initialEmailSettings }) {
     setMessage(null);
 
     try {
-      const res = await fetch("/api/admin/email/failed-logs", {
+      const res = await fetch("/api/dashboard/email/failed-logs", {
         method: "DELETE",
         headers: {
           "x-site-id": siteId,

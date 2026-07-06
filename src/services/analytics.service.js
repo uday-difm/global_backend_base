@@ -9,7 +9,7 @@ export class AnalyticsService {
     const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
 
     const isExcluded =
-      page.startsWith("/admin") ||
+      page.startsWith("/dashboard") ||
       page.startsWith("/crm") ||
       page.startsWith("/login") ||
       page.startsWith("/forgot-password") ||

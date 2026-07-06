@@ -24,7 +24,7 @@ export default function HomePage() {
       </p>
       <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
         <a
-          href="/admin"
+          href="/dashboard"
           style={{
             padding: "10px 24px",
             background: "#1b1b1b",

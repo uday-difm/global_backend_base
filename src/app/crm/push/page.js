@@ -33,7 +33,7 @@ export default function PushPage() {
 
   async function fetchOneSignalConfig() {
     try {
-      const res = await fetch("/api/admin/email/smtp", {
+      const res = await fetch("/api/dashboard/email/smtp", {
         headers: { "x-site-id": siteId }
       });
       const data = await res.json();
@@ -50,7 +50,7 @@ export default function PushPage() {
     e.preventDefault();
     setConfigSaving(true);
     try {
-      const res = await fetch("/api/admin/email/smtp", {
+      const res = await fetch("/api/dashboard/email/smtp", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

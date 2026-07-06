@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 const SKIP_PREFIXES = [
   "/api/",
   "/_next",
-  "/admin",
+  "/dashboard",
   "/crm",
   "/login",
   "/forgot-password",
@@ -93,9 +93,9 @@ export async function proxy(request) {
     "infinium";
 
   // --------------- Admin/CRM Auth Guard ---------------
-  const ADMIN_PATHS = ["/admin", "/crm", "/preview"];
-  const isAdminPath = ADMIN_PATHS.some((p) => pathname.startsWith(p));
-  if (isAdminPath) {
+  const ADMIN_PATHS = ["/dashboard", "/crm", "/preview"];
+  const isDashboardPath = ADMIN_PATHS.some((p) => pathname.startsWith(p));
+  if (isDashboardPath) {
     const hasSession =
       request.cookies.has("next-auth.session-token") ||
       request.cookies.has("__Secure-next-auth.session-token");
@@ -137,7 +137,7 @@ export async function proxy(request) {
     !pathname.startsWith("/api/") &&
     !pathname.startsWith("/_next") &&
     !pathname.startsWith("/maintenance") &&
-    !isAdminPath &&
+    !isDashboardPath &&
     process.env.NODE_ENV !== "development"
   ) {
     try {

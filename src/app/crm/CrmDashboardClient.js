@@ -82,8 +82,8 @@ export default function CrmDashboardClient({
     setAdsLoading(true);
     try {
       const [adsRes, zonesRes] = await Promise.all([
-        fetch("/api/admin/ads", { headers: { "x-site-id": siteId } }),
-        fetch("/api/admin/ads/zones", { headers: { "x-site-id": siteId } }),
+        fetch("/api/dashboard/ads", { headers: { "x-site-id": siteId } }),
+        fetch("/api/dashboard/ads/zones", { headers: { "x-site-id": siteId } }),
       ]);
       const adsJson = await adsRes.json();
       const zonesJson = await zonesRes.json();
@@ -106,10 +106,10 @@ export default function CrmDashboardClient({
     setLoading(true);
     try {
       const [resStats, resReports] = await Promise.all([
-        fetch(`/api/admin/analytics/dashboard?range=${newRange}`, {
+        fetch(`/api/dashboard/analytics/dashboard?range=${newRange}`, {
           headers: { "x-site-id": siteId },
         }),
-        fetch(`/api/admin/reports/advanced?range=${newRange}`, {
+        fetch(`/api/dashboard/reports/advanced?range=${newRange}`, {
           headers: { "x-site-id": siteId },
         }),
       ]);
@@ -155,7 +155,7 @@ export default function CrmDashboardClient({
     setAdError(null);
     setAdSuccess(null);
     try {
-      const res = await fetch("/api/admin/ads", {
+      const res = await fetch("/api/dashboard/ads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +191,7 @@ export default function CrmDashboardClient({
   const handleDeleteAd = async (id) => {
     if (!confirm("Are you sure you want to delete this ad?")) return;
     try {
-      const res = await fetch(`/api/admin/ads/${id}`, {
+      const res = await fetch(`/api/dashboard/ads/${id}`, {
         method: "DELETE",
         headers: { "x-site-id": siteId },
       });
@@ -212,7 +212,7 @@ export default function CrmDashboardClient({
     setReportResults(null);
 
     try {
-      let url = `/api/admin/analytics/custom-reports?type=${reportType}`;
+      let url = `/api/dashboard/analytics/custom-reports?type=${reportType}`;
       if (startDate) url += `&startDate=${startDate}`;
       if (endDate) url += `&endDate=${endDate}`;
 

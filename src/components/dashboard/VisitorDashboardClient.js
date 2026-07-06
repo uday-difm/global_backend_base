@@ -386,7 +386,7 @@ export default function VisitorDashboardClient({
     async (silent = false) => {
       if (!silent) setLoading(true);
       try {
-        const res = await fetch(`/api/admin/visitors/stats?days=${dateRange}`, {
+        const res = await fetch(`/api/dashboard/visitors/stats?days=${dateRange}`, {
           headers: siteIdHeader,
         });
         const data = await res.json();
@@ -409,7 +409,7 @@ export default function VisitorDashboardClient({
   const refreshLive = useCallback(async () => {
     setLiveLoading(true);
     try {
-      const res = await fetch("/api/admin/visitors/live", {
+      const res = await fetch("/api/dashboard/visitors/live", {
         headers: siteIdHeader,
       });
       const data = await res.json();
@@ -428,7 +428,7 @@ export default function VisitorDashboardClient({
   // ── Fetch paginated logs ───────────────────────────────────────────────────
   const refreshLogs = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/visitors/logs?limit=100", {
+      const res = await fetch("/api/dashboard/visitors/logs?limit=100", {
         headers: siteIdHeader,
       });
       const data = await res.json();
