@@ -203,6 +203,12 @@ const sections = [
         icon: ImageIcon,
         minRole: "AUTHOR",
       },
+      {
+        href: "/admin/quizzes",
+        label: "Quizzes",
+        icon: HelpCircle,
+        minRole: "EDITOR",
+      },
     ],
   },
 

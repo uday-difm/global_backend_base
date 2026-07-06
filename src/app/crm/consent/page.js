@@ -21,12 +21,27 @@ export default async function ConsentPage() {
     );
   }
 
-  const settings = await prisma.globalSettings.findUnique({
+  const dbLogs = await prisma.cookieConsentLog.findMany({
     where: { siteId: site.id },
-    select: { compliance: true },
+    orderBy: { createdAt: "desc" },
+    take: 500,
   });
 
-  const logs = settings?.compliance?.consentLogs || [];
+  const logs = dbLogs.map((item) => {
+    let consentType = "Essential Only";
+    if (item.analytics && item.marketing) consentType = "Accept All";
+    else if (item.analytics) consentType = "Analytics Only";
+    else if (item.marketing) consentType = "Marketing Only";
+    else if (!item.accepted) consentType = "Declined";
+
+    return {
+      visitorId: item.visitorId,
+      consentType,
+      accepted: item.accepted,
+      timestamp: item.createdAt,
+    };
+  });
+
   const acceptedCount = logs.filter((l) => l.accepted).length;
   const acceptanceRate = logs.length > 0 ? Math.round((acceptedCount / logs.length) * 100) : 0;
 

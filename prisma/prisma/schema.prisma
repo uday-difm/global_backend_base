@@ -956,3 +956,33 @@ model AdAnalytic {
 
   @@index([adId])
 }
+
+model Quiz {
+  id            Int     @id @default(autoincrement()) @map("_id")
+  question      String  @db.Text
+  options       String  @db.Text
+  correctAnswer String  @db.Text
+  explanation   String  @db.Text
+
+  @@map("quizzes")
+}
+
+model IpQuizAnalytic {
+  id      Int    @id @default(autoincrement())
+  user_ip String @db.VarChar(50)
+  played  Int    @default(0)
+
+  @@map("ip_quiz_analytic")
+}
+
+model QuizAnalytics {
+  id            Int      @id @default(autoincrement())
+  userId        String   @db.VarChar(255)
+  quizId        Int
+  correct       Int
+  choose_option String   @db.VarChar(255)
+  time_taken    String   @db.VarChar(255)
+
+  @@map("quiz_analytics")
+}
+
