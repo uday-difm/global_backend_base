@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { checkSitePermission } from "@/lib/apiAuth";
+import { apiSuccess } from "@/core/errors";
 
 // GET /api/dashboard/forms/config  — fetch spam + notification settings
 export async function GET(req) {
