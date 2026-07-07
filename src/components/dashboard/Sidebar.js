@@ -321,7 +321,7 @@ function canSee(userRole, minRole) {
 
 function SidebarLink({ href, label, icon: Icon, pathname }) {
   const isActive =
-    pathname === href || (href !== "/dashboard/dashboard" && pathname.startsWith(href));
+    pathname === href || (href !== "/dashboard/dashboard" && href !== "/crm" && pathname.startsWith(href));
 
   return (
     <Link
