@@ -100,15 +100,32 @@ export async function GET(req, context) {
           { slug: targetPostSlug }
         ]
       },
-      select: { title: true, seoTitle: true, seoDescription: true, excerpt: true }
+      select: {
+        title: true,
+        seoTitle: true,
+        seoDescription: true,
+        excerpt: true,
+        canonicalUrl: true,
+        ogImage: true,
+        featuredImage: {
+          select: {
+            secureUrl: true,
+            url: true,
+            altText: true
+          }
+        }
+      }
     });
 
     if (post) {
+      const ogImageUrl = post.ogImage || post.featuredImage?.secureUrl || post.featuredImage?.url || null;
       return NextResponse.json(apiSuccess({ type: "post",
         seo: {
           title: post.seoTitle || post.title,
           description: post.seoDescription || post.excerpt || null,
-          canonical: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001"}/posts/${targetPostSlug}`
+          canonical: post.canonicalUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001"}/posts/${targetPostSlug}`,
+          ogImage: ogImageUrl,
+          ogImageAlt: post.featuredImage?.altText || post.seoTitle || post.title || ""
         } }));
     }
 
