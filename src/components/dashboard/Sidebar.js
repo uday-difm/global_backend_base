@@ -143,7 +143,7 @@ const crmSections = [
         minRole: "ADMIN",
       },
       {
-        href: "/dashboard/notifications",
+        href: "/crm/notifications",
         label: "Notification Settings",
         icon: Bell,
         minRole: "ADMIN",
