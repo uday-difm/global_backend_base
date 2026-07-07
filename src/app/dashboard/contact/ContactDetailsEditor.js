@@ -641,7 +641,7 @@ export default function ContactDetailsEditor({ siteId, initialData }) {
         {maps.embedUrl && (
           <div className="mt-3 rounded-lg overflow-hidden border border-slate-200 h-48">
             <iframe
-              src={maps.embedUrl}
+              src={maps.embedUrl.trim().startsWith("<iframe") ? (maps.embedUrl.match(/src=["']([^"']+)["']/) || [])[1] || "" : maps.embedUrl}
               className="w-full h-full"
               allowFullScreen
               loading="lazy"
