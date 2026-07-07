@@ -236,24 +236,57 @@ export class MediaService extends BaseService {
     });
   }
 
+  async _getAllSubfolderIds(siteId, folderId) {
+    const ids = [];
+    const queue = [folderId];
+    while (queue.length > 0) {
+      const currentId = queue.shift();
+      const children = await prisma.mediaFolder.findMany({
+        where: { siteId, parentId: currentId },
+        select: { id: true }
+      });
+      for (const child of children) {
+        ids.push(child.id);
+        queue.push(child.id);
+      }
+    }
+    return ids;
+  }
+
   async deleteFolder(siteId, folderId) {
     const folder = await mediaFolderRepository.findUnique(siteId, folderId);
     if (!folder) {
       throw new NotFoundError("Folder");
     }
-    const parentIdOfDeleted = folder.parentId;
 
+    const subfolderIds = await this._getAllSubfolderIds(siteId, folderId);
+    const allFolderIds = [folderId, ...subfolderIds];
+
+    // 1. Find all media items inside this folder and all nested folders
+    const mediaItems = await prisma.media.findMany({
+      where: { siteId, folderId: { in: allFolderIds } },
+      select: { id: true, publicId: true }
+    });
+
+    // 2. Delete all those files from Cloudinary
+    for (const item of mediaItems) {
+      try {
+        await cloudinary.uploader.destroy(item.publicId);
+      } catch (err) {
+        console.warn("Cloudinary file deletion warning during cascade:", err.message);
+      }
+    }
+
+    // 3. Delete database records in cascade order
     await prisma.$transaction([
-      prisma.mediaFolder.updateMany({
-        where: { siteId, parentId: folderId },
-        data: { parentId: parentIdOfDeleted },
+      prisma.media.deleteMany({
+        where: { siteId, folderId: { in: allFolderIds } }
       }),
-      prisma.media.updateMany({
-        where: { siteId, folderId },
-        data: { folderId: parentIdOfDeleted },
+      prisma.mediaFolder.deleteMany({
+        where: { siteId, id: { in: subfolderIds } }
       }),
       prisma.mediaFolder.delete({
-        where: { id: folderId, siteId },
+        where: { id: folderId, siteId }
       })
     ]);
 

@@ -986,3 +986,39 @@ model QuizAnalytics {
   @@map("quiz_analytics")
 }
 
+model Magazine {
+  id                 Int       @id @default(autoincrement()) @map("idMagazines")
+  magazineId         String    @map("magazine_id") @db.VarChar(255)
+  title              String    @map("magazine_title") @db.VarChar(255)
+  description        String    @map("magazine_description") @db.Text
+  tags               String    @map("magazine_tags") @db.VarChar(255)
+  coverImage         String    @map("magazine_cover_image") @db.VarChar(255)
+  link               String    @map("magazine_link") @db.VarChar(255)
+  date               DateTime  @map("magazine_date") @db.Date
+  category           String    @map("magazine_category") @db.VarChar(255)
+  magCloudLink       String    @map("MagCloudLink") @db.VarChar(255)
+  slug               String    @unique @map("magazine_slug") @db.VarChar(191)
+  status             Int       @default(1)
+  timestamp          DateTime  @default(now()) @map("magazine_timestamp")
+
+  @@map("magazines")
+}
+
+model Auth {
+  id           Int       @id @default(autoincrement()) @map("idauth")
+  name         String?   @db.VarChar(255)
+  username     String?   @unique @db.VarChar(191)
+  email        String?   @unique @db.VarChar(191)
+  password     String?   @db.VarChar(255)
+  role         String?   @default("user") @db.VarChar(50)
+  profile      String?   @db.VarChar(255)
+  profession   String?   @db.VarChar(255)
+  bio          String?   @db.Text
+  date         DateTime  @default(now())
+  otp          String?   @db.VarChar(50)
+  otpCreatedAt DateTime?
+
+  @@map("auth")
+}
+
+
