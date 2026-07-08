@@ -65,53 +65,86 @@ async function run() {
   console.log(`\n[1/5] Analyzing target project... OK`);
   console.log(`      Found Next.js project at: ${targetPath}`);
 
-  // 1. Merge package.json dependencies
-  console.log("\n[2/5] Merging package.json dependencies...");
+  // 1. Merge package.json dependencies, devDependencies, scripts, and prisma configurations
+  console.log("\n[2/5] Merging package.json configurations...");
   const basePkg = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
   const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, "utf8"));
 
   targetPkg.dependencies = targetPkg.dependencies || {};
   targetPkg.devDependencies = targetPkg.devDependencies || {};
+  targetPkg.scripts = targetPkg.scripts || {};
 
   let addedDeps = 0;
-  const depsToMerge = [
-    "@prisma/client", "next-auth", "bcryptjs", "cloudinary", "zod", 
-    "lucide-react", "sharp", "@fortawesome/fontawesome-svg-core", 
-    "@fortawesome/free-brands-svg-icons", "@fortawesome/free-solid-svg-icons",
-    "@fortawesome/react-fontawesome", "js-cookie", "react-share"
-  ];
-
-  for (const dep of depsToMerge) {
-    if (basePkg.dependencies[dep] && !targetPkg.dependencies[dep]) {
-      targetPkg.dependencies[dep] = basePkg.dependencies[dep];
+  for (const [dep, ver] of Object.entries(basePkg.dependencies || {})) {
+    if (!targetPkg.dependencies[dep]) {
+      targetPkg.dependencies[dep] = ver;
       addedDeps++;
     }
   }
 
-  const devDepsToMerge = ["prisma"];
-  for (const dep of devDepsToMerge) {
-    if (basePkg.devDependencies[dep] && !targetPkg.devDependencies[dep] && !targetPkg.dependencies[dep]) {
-      targetPkg.devDependencies[dep] = basePkg.devDependencies[dep];
+  for (const [dep, ver] of Object.entries(basePkg.devDependencies || {})) {
+    if (!targetPkg.devDependencies[dep] && !targetPkg.dependencies[dep]) {
+      targetPkg.devDependencies[dep] = ver;
       addedDeps++;
     }
+  }
+
+  let addedScripts = 0;
+  for (const [scriptName, cmd] of Object.entries(basePkg.scripts || {})) {
+    if (!targetPkg.scripts[scriptName]) {
+      targetPkg.scripts[scriptName] = cmd;
+      addedScripts++;
+    }
+  }
+
+  if (basePkg.prisma) {
+    targetPkg.prisma = { ...targetPkg.prisma, ...basePkg.prisma };
   }
 
   fs.writeFileSync(targetPkgPath, JSON.stringify(targetPkg, null, 2), "utf8");
-  console.log(`      OK (Merged/Updated ${addedDeps} dependencies)`);
+  console.log(`      OK (Merged/Updated ${addedDeps} dependencies/devDependencies, and ${addedScripts} scripts)`);
 
-  // 2. Auto-Copy backend and UI folders
+  // 2. Auto-Copy backend and UI folders & files
   console.log("\n[3/5] Migrating backend folders & UI components...");
   const foldersToCopy = [
+    // App routes
     { src: "src/app/dashboard", dest: "src/app/dashboard" },
     { src: "src/app/crm", dest: "src/app/crm" },
     { src: "src/app/api", dest: "src/app/api" },
+    { src: "src/app/login", dest: "src/app/login" },
+    { src: "src/app/forgot-password", dest: "src/app/forgot-password" },
+    { src: "src/app/reset-password", dest: "src/app/reset-password" },
+    { src: "src/app/maintenance", dest: "src/app/maintenance" },
+    { src: "src/app/preview", dest: "src/app/preview" },
+    
+    // Components
     { src: "src/components/dashboard", dest: "src/components/dashboard" },
     { src: "src/components/media", dest: "src/components/media" },
+    { src: "src/components/providers", dest: "src/components/providers" },
+    { src: "src/components/utils", dest: "src/components/utils" },
+    { src: "src/components/ThemeToggle.js", dest: "src/components/ThemeToggle.js" },
+    { src: "src/components/BlockEditor.js", dest: "src/components/BlockEditor.js" },
+    { src: "src/components/ContactFormSection.js", dest: "src/components/ContactFormSection.js" },
+    { src: "src/components/DynamicBlockEditor.js", dest: "src/components/DynamicBlockEditor.js" },
+    
+    // Services / Repositories / Core / Lib / Common / SDK
     { src: "src/services", dest: "src/services" },
     { src: "src/repositories", dest: "src/repositories" },
+    { src: "src/mappers", dest: "src/mappers" },
+    { src: "src/data", dest: "src/data" },
     { src: "src/core", dest: "src/core" },
     { src: "src/lib", dest: "src/lib" },
-    { src: "utils", dest: "utils" }
+    { src: "src/common", dest: "src/common" },
+    { src: "src/sdk", dest: "src/sdk" },
+    { src: "utils", dest: "utils" },
+    
+    // Individual files
+    { src: "src/instrumentation.js", dest: "src/instrumentation.js" },
+    { src: "src/proxy.js", dest: "src/proxy.js" },
+    
+    // Prisma config and seed
+    { src: "prisma/prisma/seed.js", dest: "prisma/seed.js" },
+    { src: "prisma/prisma/prisma.config.ts", dest: "prisma/prisma.config.ts" }
   ];
 
   for (const f of foldersToCopy) {
@@ -119,7 +152,17 @@ async function run() {
     const destPath = path.join(targetPath, f.dest);
     if (fs.existsSync(srcPath)) {
       console.log(`   -> Copying ${f.src} to ${f.dest}...`);
-      copyDirSync(srcPath, destPath);
+      if (fs.statSync(srcPath).isDirectory()) {
+        copyDirSync(srcPath, destPath);
+      } else {
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+        if (fs.existsSync(destPath)) {
+          const backupPath = `${destPath}.backup-${Date.now()}`;
+          fs.copyFileSync(destPath, backupPath);
+          console.log(`   [Backup] Existing file backed up to: ${path.basename(backupPath)}`);
+        }
+        fs.copyFileSync(srcPath, destPath);
+      }
     }
   }
   console.log("      OK (Files copied successfully)");
@@ -144,32 +187,32 @@ async function run() {
     const baseSchema = fs.readFileSync(baseSchemaPath, "utf8");
     const targetSchema = fs.readFileSync(targetSchemaPath, "utf8");
 
-    // Extract model names from target schema
-    const targetModels = new Set();
-    const modelRegex = /model\s+(\w+)\s+{/g;
+    // Extract model and enum names from target schema
+    const targetEntities = new Set();
+    const entityRegex = /(?:model|enum)\s+(\w+)\s+{/g;
     let match;
-    while ((match = modelRegex.exec(targetSchema)) !== null) {
-      targetModels.add(match[1]);
+    while ((match = entityRegex.exec(targetSchema)) !== null) {
+      targetEntities.add(match[1]);
     }
 
-    // Parse base schema models and append missing ones
+    // Parse base schema models/enums and append missing ones
     let appendedSchema = targetSchema;
-    const baseModelBlocks = baseSchema.split(/(?=model\s+\w+\s+{)/);
+    const baseBlocks = baseSchema.split(/(?=(?:model|enum)\s+\w+\s+{)/);
     
-    let addedModelsCount = 0;
-    for (const block of baseModelBlocks) {
-      const modelMatch = block.match(/model\s+(\w+)\s+{/);
-      if (modelMatch && modelMatch[1]) {
-        const modelName = modelMatch[1];
-        if (!targetModels.has(modelName)) {
+    let addedEntitiesCount = 0;
+    for (const block of baseBlocks) {
+      const entityMatch = block.match(/(?:model|enum)\s+(\w+)\s+{/);
+      if (entityMatch && entityMatch[1]) {
+        const entityName = entityMatch[1];
+        if (!targetEntities.has(entityName)) {
           appendedSchema += "\n" + block.trim() + "\n";
-          addedModelsCount++;
+          addedEntitiesCount++;
         }
       }
     }
 
     fs.writeFileSync(targetSchemaPath, appendedSchema, "utf8");
-    console.log(`      OK (Appended ${addedModelsCount} new models to target schema.prisma)`);
+    console.log(`      OK (Appended ${addedEntitiesCount} new models/enums to target schema.prisma)`);
   }
 
   // 4. Append Environment Variables
@@ -215,8 +258,51 @@ CLOUDINARY_API_SECRET=""
     }
   }
 
-  // 5. Run build tasks
-  console.log("\n[6/6] Installing packages & generating Prisma client...");
+  // 5. Update root layout.js/layout.tsx to be wrapped in AuthProvider
+  console.log("\n[6/7] Ensuring root layout is wrapped with AuthProvider...");
+  const targetLayoutJS = path.join(targetPath, "src/app/layout.js");
+  const targetLayoutTSX = path.join(targetPath, "src/app/layout.tsx");
+  const layoutPath = fs.existsSync(targetLayoutTSX) ? targetLayoutTSX : (fs.existsSync(targetLayoutJS) ? targetLayoutJS : null);
+
+  if (layoutPath) {
+    let layoutContent = fs.readFileSync(layoutPath, "utf8");
+    if (!layoutContent.includes("AuthProvider") && !layoutContent.includes("SessionProvider")) {
+      console.log(`   -> Wrapping ${path.basename(layoutPath)} with AuthProvider & ThemeProvider...`);
+      const backupPath = `${layoutPath}.backup-${Date.now()}`;
+      fs.copyFileSync(layoutPath, backupPath);
+      console.log(`      [Backup] Saved to ${path.basename(backupPath)}`);
+
+      const imports = `import AuthProvider from "@/components/providers/SessionProvider";\nimport ThemeProvider from "@/components/providers/ThemeProvider";\nimport SessionTimeoutHandler from "@/components/utils/SessionTimeoutHandler";\nimport { Toaster } from "sonner";\nimport "@/core/listeners";\n`;
+      layoutContent = imports + "\n" + layoutContent;
+
+      const bodyStartRegex = /(<body[^>]*>)/;
+      const bodyEndRegex = /(<\/body>)/;
+
+      if (bodyStartRegex.test(layoutContent) && bodyEndRegex.test(layoutContent)) {
+        layoutContent = layoutContent.replace(bodyStartRegex, `$1\n        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>\n          <AuthProvider>\n            <SessionTimeoutHandler timeoutMinutes={30} />`);
+        layoutContent = layoutContent.replace(bodyEndRegex, `            <Toaster richColors position="top-right" closeButton />\n          </AuthProvider>\n        </ThemeProvider>\n      $1`);
+      }
+
+      const htmlStartRegex = /(<html[^>]*>)/;
+      if (htmlStartRegex.test(layoutContent)) {
+        const htmlTag = layoutContent.match(htmlStartRegex)[0];
+        if (!htmlTag.includes("suppressHydrationWarning")) {
+          const newHtmlTag = htmlTag.replace(">", " suppressHydrationWarning>");
+          layoutContent = layoutContent.replace(htmlTag, newHtmlTag);
+        }
+      }
+
+      fs.writeFileSync(layoutPath, layoutContent, "utf8");
+      console.log("      OK (Layout updated successfully)");
+    } else {
+      console.log("      OK (Layout already has AuthProvider/SessionProvider)");
+    }
+  } else {
+    console.log("      ⚠️ Warning: No root layout file found. Please create one.");
+  }
+
+  // 6. Run build tasks
+  console.log("\n[7/7] Installing packages & generating Prisma client...");
   try {
     console.log("   -> Running npm install inside target directory (this may take a minute)...");
     execSync("npm install", { cwd: targetPath, stdio: "inherit" });

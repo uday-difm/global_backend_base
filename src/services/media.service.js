@@ -190,7 +190,7 @@ export class MediaService extends BaseService {
 
     try {
       await cloudinary.uploader.destroy(media.publicId);
-    } catch {}
+    } catch { }
 
     const updated = await mediaRepository.update(siteId, mediaId, {
       fileName,

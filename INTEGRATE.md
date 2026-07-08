@@ -21,7 +21,27 @@ All backend administration, APIs, and authentication routes are isolated to thes
 
 ## Integration Steps
 
-### 1. Copy the Backend Files into Your Project
+You can integrate the backend using either the automatic script (recommended) or manually.
+
+### Option A: Automatic Integration (Recommended)
+
+An interactive script is provided to automate copying files, merging dependencies in `package.json`, merging Prisma schemas, and appending environment variables.
+
+To run it, navigate to the `global-backend-base` directory and run:
+
+```bash
+node integrate.js
+```
+
+Follow the prompts to enter the path to your existing Next.js project.
+
+---
+
+### Option B: Manual Integration
+
+If you prefer to perform the steps manually, follow the process below:
+
+#### 1. Copy the Backend Files into Your Project
 
 Copy the isolated backend folders and files into your existing Next.js project directory. Do NOT overwrite your existing `src/app/page.js` or `src/app/layout.js`.
 
@@ -62,7 +82,7 @@ cp global-backend-base/src/proxy.js my-existing-site/src/
 cp -r global-backend-base/src/sdk my-existing-site/src/
 ```
 
-### 2. Merge dependencies in `package.json`
+#### 2. Merge dependencies in `package.json`
 
 To automatically merge the scripts, dependencies, devDependencies, and prisma configurations from the backend template's `package.json` into your existing project's `package.json` without doing it manually, run this command from your existing project directory:
 
@@ -75,7 +95,7 @@ Once merged, install the new dependencies:
 npm install
 ```
 
-### 3. Configure environment variables
+#### 3. Configure environment variables
 
 Copy `.env.example` to your project root if you do not have one, or copy the variables from it into your existing `.env` file:
 
@@ -88,7 +108,7 @@ NEXT_PUBLIC_SITE_ID="your_site_id"
 SITE_ID="your_site_id"
 ```
 
-### 4. Push Database Schema & Seed Data
+#### 4. Push Database Schema & Seed Data
 
 Ensure your database is running, then push the schema and seed the default admin account:
 
@@ -104,7 +124,7 @@ Default Admin Credentials created by seed:
 - **Email:** `admin@example.com`
 - **Password:** `Admin@123`
 
-### 5. Run local development
+#### 5. Run local development
 
 Start the dev server:
 ```bash
