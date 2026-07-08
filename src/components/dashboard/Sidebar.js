@@ -20,6 +20,7 @@ import {
   Database,
   ArrowLeftRight,
   PanelBottom,
+  Layers,
   PanelTop,
   ShieldCheck,
   Phone,
@@ -154,17 +155,6 @@ const crmSections = [
 
 const sections = [
   {
-    title: "Management",
-    links: [
-      {
-        href: "/dashboard/sites",
-        label: "Sites",
-        icon: Globe,
-        minRole: "ADMIN",
-      },
-    ],
-  },
-  {
     title: "Overview",
     links: [
       {
@@ -189,6 +179,12 @@ const sections = [
         href: "/dashboard/blogs",
         label: "Blogs",
         icon: Newspaper,
+        minRole: "AUTHOR",
+      },
+      {
+        href: "/dashboard/magazines",
+        label: "Magazines",
+        icon: Layers,
         minRole: "AUTHOR",
       },
       {

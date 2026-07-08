@@ -25,6 +25,36 @@ async function uploadToCloudinary(buffer, fileName, folder = "magazines") {
   });
 }
 
+
+export async function GET(request) {
+  try {
+    const user = await requireAuth();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+
+    const magazines = await prisma.magazine.findMany({
+      where: search ? {
+        OR: [
+          { title: { contains: search } },
+          { description: { contains: search } },
+          { tags: { contains: search } },
+          { category: { contains: search } }
+        ]
+      } : {},
+      orderBy: { date: "desc" },
+    });
+
+    return NextResponse.json({ success: true, magazines });
+  } catch (error) {
+    console.error("Error fetching magazines:", error);
+    return NextResponse.json({ error: "Failed to fetch magazines." }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   try {
     const user = await requireAuth();

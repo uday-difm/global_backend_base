@@ -6,9 +6,22 @@ import { useTheme } from "./providers/ThemeProvider";
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [resolvedTheme, setResolvedTheme] = useState("light");
 
   // Avoid hydration mismatch — only render actual UI after mount
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      setResolvedTheme(systemTheme);
+    } else {
+      setResolvedTheme(theme);
+    }
+  }, [theme, mounted]);
 
   if (!mounted) {
     return (
@@ -21,7 +34,7 @@ export default function ThemeToggle() {
     );
   }
 
-  const isDark = theme === "dark";
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button

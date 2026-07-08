@@ -13,10 +13,8 @@ export default async function Layout({ children }) {
     redirect("/login");
   }
 
-  const site = await getSiteForUser(user);
-  const siteId = site ? site.id : null;
-
-  const connectedSiteId = process.env.NEXT_PUBLIC_SITE_ID || process.env.SITE_ID || "infinium";
+  const siteId = process.env.NEXT_PUBLIC_SITE_ID || process.env.SITE_ID || "infinium";
+  const connectedSiteId = siteId;
   let sites = [];
   const connectedSite = await prisma.site.findUnique({
     where: { id: connectedSiteId, deletedAt: null },

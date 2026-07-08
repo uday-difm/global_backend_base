@@ -14,7 +14,7 @@ export default function DashboardLayout({ children, siteId, sites = [] }) {
   }, [siteId]);
 
   return (
-    <div className="dashboard-layout flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+    <div className="dashboard-layout flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <Sidebar
         siteId={siteId}
         isOpen={sidebarOpen}
@@ -28,12 +28,13 @@ export default function DashboardLayout({ children, siteId, sites = [] }) {
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">{children}</main>
+        <main className="flex-grow p-4 sm:p-6 overflow-y-auto">{children}</main>
         <style>{`
-                  .dark .dashboard-layout :where(.bg-white) { background-color: #1e293b !important; }
-                  .dark .dashboard-layout :where(.bg-gray-50, .bg-slate-50) { background-color: #1e293b !important; }
-                  .dark .dashboard-layout :where(td, th, .border-gray-100, .border-gray-200, .border-gray-150, .border-slate-100, .border-slate-200) { border-color: #334155 !important; }
-                  .dark .dashboard-layout :where(.divide-gray-100, .divide-gray-150, .divide-slate-100) > * { border-color: #334155 !important; }
+                  .dark .dashboard-layout { background-color: #030712 !important; }
+                  .dark .dashboard-layout :where(.bg-white) { background-color: #0f172a !important; }
+                  .dark .dashboard-layout :where(.bg-gray-50, .bg-slate-50) { background-color: #0b0f19 !important; }
+                  .dark .dashboard-layout :where(td, th, .border-gray-100, .border-gray-200, .border-gray-150, .border-slate-100, .border-slate-200) { border-color: #1e293b !important; }
+                  .dark .dashboard-layout :where(.divide-gray-100, .divide-gray-150, .divide-slate-100) > * { border-color: #1e293b !important; }
                   .dark .dashboard-layout :where(.text-gray-800, .text-slate-800) { color: #e2e8f0 !important; }
                   .dark .dashboard-layout :where(.text-gray-900, .text-slate-900) { color: #f1f5f9 !important; }
                   .dark .dashboard-layout :where(.text-gray-700, .text-slate-700) { color: #cbd5e1 !important; }
@@ -47,15 +48,15 @@ export default function DashboardLayout({ children, siteId, sites = [] }) {
                   .dark .dashboard-layout :where(.text-amber-600, .text-amber-700) { color: #fbbf24 !important; }
                   .dark .dashboard-layout :where(.text-red-600, .text-red-700) { color: #f87171 !important; }
                   .dark .dashboard-layout :where(.text-emerald-600, .text-emerald-700) { color: #34d399 !important; }
-                  .dark .dashboard-layout :where(.shadow-sm) { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3) !important; }
+                  .dark .dashboard-layout :where(.shadow-sm) { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) !important; }
                   .dark .dashboard-layout :where(.hover\\:bg-gray-50):hover,
-                  .dark .dashboard-layout :where(.hover\\:bg-slate-50):hover { background-color: #334155 !important; }
+                  .dark .dashboard-layout :where(.hover\\:bg-slate-50):hover { background-color: #1e293b !important; }
                   .dark .dashboard-layout :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
-                    background-color: #0f172a !important;
+                    background-color: #070a13 !important;
                     color: #e2e8f0 !important;
-                    border-color: #475569 !important;
+                    border-color: #1e293b !important;
                   }
-                  .dark .dashboard-layout :where(input::placeholder, textarea::placeholder) { color: #64748b !important; }
+                  .dark .dashboard-layout :where(input::placeholder, textarea::placeholder) { color: #475569 !important; }
                   .dark .dashboard-layout :where(.bg-blue-50) { background-color: #1e3a5f !important; }
                   .dark .dashboard-layout :where(.bg-green-50) { background-color: #064e3b !important; }
                   .dark .dashboard-layout :where(.bg-red-50) { background-color: #7f1d1d !important; }

@@ -181,7 +181,7 @@ export default function Topbar({ siteId, sites = [], onMenuClick }) {
   return (
     <>
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      <header className="sticky top-0 z-40 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-900">
         <div className="flex h-16 items-center justify-between px-3 sm:px-4 md:px-6">
           {/* Left */}
           <div className="flex items-center gap-2 sm:gap-3">

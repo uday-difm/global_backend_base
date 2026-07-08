@@ -62,11 +62,11 @@ async function run() {
     return;
   }
 
-  console.log(`\n[1/5] Analyzing target project... OK`);
+  console.log(`\n[1/8] Analyzing target project... OK`);
   console.log(`      Found Next.js project at: ${targetPath}`);
 
   // 1. Merge package.json dependencies, devDependencies, scripts, and prisma configurations
-  console.log("\n[2/5] Merging package.json configurations...");
+  console.log("\n[2/8] Merging package.json configurations...");
   const basePkg = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
   const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, "utf8"));
 
@@ -105,7 +105,7 @@ async function run() {
   console.log(`      OK (Merged/Updated ${addedDeps} dependencies/devDependencies, and ${addedScripts} scripts)`);
 
   // 2. Auto-Copy backend and UI folders & files
-  console.log("\n[3/5] Migrating backend folders & UI components...");
+  console.log("\n[3/8] Migrating backend folders & UI components...");
   const foldersToCopy = [
     // App routes
     { src: "src/app/dashboard", dest: "src/app/dashboard" },
@@ -168,7 +168,7 @@ async function run() {
   console.log("      OK (Files copied successfully)");
 
   // 3. Auto-Merge schema.prisma
-  console.log("\n[4/5] Merging database schema (schema.prisma)...");
+  console.log("\n[4/8] Merging database schema (schema.prisma)...");
   const baseSchemaPath = path.join(__dirname, "prisma/prisma/schema.prisma");
   let targetSchemaPath = path.join(targetPath, "prisma/schema.prisma");
 
@@ -216,7 +216,7 @@ async function run() {
   }
 
   // 4. Append Environment Variables
-  console.log("\n[5/5] Appending configuration values to .env...");
+  console.log("\n[5/8] Appending configuration values to .env...");
   const targetEnvPath = path.join(targetPath, ".env");
   const baseEnvExamplePath = path.join(__dirname, ".env.example");
 
@@ -259,7 +259,7 @@ CLOUDINARY_API_SECRET=""
   }
 
   // 5. Update root layout.js/layout.tsx to be wrapped in AuthProvider
-  console.log("\n[6/7] Ensuring root layout is wrapped with AuthProvider...");
+  console.log("\n[6/8] Ensuring root layout is wrapped with AuthProvider...");
   const targetLayoutJS = path.join(targetPath, "src/app/layout.js");
   const targetLayoutTSX = path.join(targetPath, "src/app/layout.tsx");
   const layoutPath = fs.existsSync(targetLayoutTSX) ? targetLayoutTSX : (fs.existsSync(targetLayoutJS) ? targetLayoutJS : null);
@@ -301,8 +301,32 @@ CLOUDINARY_API_SECRET=""
     console.log("      ⚠️ Warning: No root layout file found. Please create one.");
   }
 
-  // 6. Run build tasks
-  console.log("\n[7/7] Installing packages & generating Prisma client...");
+  // 6. Ensure target globals.css supports class-based dark mode
+  console.log("\n[7/8] Configuring Tailwind v4 class-based dark mode variant...");
+  const targetGlobalsCSS = path.join(targetPath, "src/app/globals.css");
+  if (fs.existsSync(targetGlobalsCSS)) {
+    let cssContent = fs.readFileSync(targetGlobalsCSS, "utf8");
+    if (!cssContent.includes("@variant dark")) {
+      console.log("   -> Appending @variant dark rules to globals.css...");
+      if (cssContent.includes('@import "tailwindcss";')) {
+        cssContent = cssContent.replace(
+          '@import "tailwindcss";',
+          '@import "tailwindcss";\n\n/* ─── Tailwind v4: use class-based dark mode (for next-themes compatibility) ─── */\n@variant dark (&:where(.dark, .dark *));'
+        );
+      } else {
+        cssContent = '/* ─── Tailwind v4: use class-based dark mode ─── */\n@variant dark (&:where(.dark, .dark *));\n\n' + cssContent;
+      }
+      fs.writeFileSync(targetGlobalsCSS, cssContent, "utf8");
+      console.log("      OK (globals.css updated successfully)");
+    } else {
+      console.log("      OK (globals.css already has dark variant defined)");
+    }
+  } else {
+    console.log("      ⚠️ Warning: src/app/globals.css not found.");
+  }
+
+  // 7. Run build tasks
+  console.log("\n[8/8] Installing packages & generating Prisma client...");
   try {
     console.log("   -> Running npm install inside target directory (this may take a minute)...");
     execSync("npm install", { cwd: targetPath, stdio: "inherit" });
