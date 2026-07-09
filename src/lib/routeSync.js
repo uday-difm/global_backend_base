@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import prisma from "@/lib/prisma";
 
-const SITE_ID = "ebh";
+const SITE_ID = process.env.SITE_ID || "AHP";
 
 const EXCLUDED_PREFIXES = [
   "/dashboard",
@@ -86,8 +86,8 @@ export async function syncRoutes() {
       update: {},
       create: {
         id: SITE_ID,
-        name: "Earth By Humans",
-        domain: "earthbyhumans.com",
+        name: SITE_ID === "AHP" ? "A Health Place" : "Earth By Humans",
+        domain: SITE_ID === "AHP" ? "ahealthplace.com" : "earthbyhumans.com",
         isActive: true,
       },
     });
@@ -127,14 +127,14 @@ export async function syncRoutes() {
     });
 
     console.log(
-      `[EBH Startup] ✅ Auto-discovered and synced ${synced} routes to global backend.`
+      `[${SITE_ID} Startup] ✅ Auto-discovered and synced ${synced} routes to global backend.`
     );
     if (deleteResult.count > 0) {
       console.log(
-        `[EBH Startup] 🗑️ Cleaned up ${deleteResult.count} obsolete pages from database.`
+        `[${SITE_ID} Startup] 🗑️ Cleaned up ${deleteResult.count} obsolete pages from database.`
       );
     }
   } catch (err) {
-    console.error("[EBH Startup] ⚠️ Route sync failed:", err.message);
+    console.error(`[${SITE_ID} Startup] ⚠️ Route sync failed:`, err.message);
   }
 }
