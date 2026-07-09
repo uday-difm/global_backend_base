@@ -26,6 +26,18 @@ CMSClient.prototype.getPosts = function (options = {}) {
   return this._request(`/api/posts${qs ? "?" + qs : ""}`);
 };
 
+CMSClient.prototype.getMagazines = function (options = {}) {
+  const params = new URLSearchParams();
+  if (options.siteId) params.set("siteId", options.siteId);
+  const qs = params.toString();
+  return this._request(`/api/magazine${qs ? "?" + qs : ""}`);
+};
+
+CMSClient.prototype.getMagazineBySlug = function (slug) {
+  if (!slug) throw new Error("Magazine slug is required");
+  return this._request(`/api/magazine/${slug}`);
+};
+
 export const cms = new CMSClient({
   baseUrl: process.env.NEXT_PUBLIC_CMS_BASE_URL ||
     (typeof window === "undefined"
