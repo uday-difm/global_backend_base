@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "npx prisma generate --schema=prisma/schema.prisma && next build",
+    "build": "npx prisma generate --schema=prisma/schema.prisma && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "npx prisma generate --schema=prisma/schema.prisma",

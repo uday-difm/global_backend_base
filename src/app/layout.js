@@ -75,7 +75,7 @@ export default async function RootLayout({ children }) {
   //   import Header from "@/components/Header";
   //   import Footer from "@/components/Footer";
   //   import { getLayoutData } from "@/services/layout.service";
-  //   import { CookieConsentBanner, CtaPopups, CtaFloatingButtons } from "@yourcompany/global-backend-next/components";
+  //   import { CookieConsentBanner, CtaPopups, CtaFloatingButtons, GlobalAnalytics } from "@yourcompany/global-backend-next/components";
   //
   //   const layout = await getLayoutData();
   //
@@ -85,6 +85,7 @@ export default async function RootLayout({ children }) {
   //         <Header navigation={layout.navigation} logoUrl={layout.logoUrl} />
   //         <main>{children}</main>
   //         <Footer navigation={layout.navigation} copyright={layout.copyright} />
+  //         <GlobalAnalytics settings={layout.rawSettings} />
   //         <CookieConsentBanner complianceSettings={layout.rawSettings?.compliance} siteId={process.env.NEXT_PUBLIC_SITE_ID} baseUrl={process.env.NEXT_PUBLIC_CMS_BASE_URL} />
   //         <CtaPopups ctaConfig={layout.rawSettings?.ctaConfig} />
   //         <CtaFloatingButtons ctaConfig={layout.rawSettings?.ctaConfig} />
